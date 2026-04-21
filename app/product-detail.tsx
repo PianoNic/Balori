@@ -67,17 +67,27 @@ export default function ProductDetailScreen() {
           PORTION SIZE — {portionGrams}g
         </Text>
         <View style={styles.portionRow}>
-          {PORTION_OPTIONS.map((g, i) => (
-            <Chip
-              key={g}
-              selected={i === 0 ? portionGrams === g : false}
-              onPress={() => setPortionGrams(i === 0 ? g : portionGrams + g)}
-              style={[styles.portionChip, { backgroundColor: portionGrams === g && i === 0 ? theme.colors.primary : theme.colors.elevation.level2 }]}
-              textStyle={{ color: portionGrams === g && i === 0 ? theme.colors.onPrimary : theme.colors.onSurface }}
-            >
-              {i === 0 ? `${g}g` : `+${g}g`}
-            </Chip>
-          ))}
+          <Chip
+            onPress={() => setPortionGrams(100)}
+            style={[styles.portionChip, { backgroundColor: portionGrams === 100 ? theme.colors.primary : theme.colors.elevation.level2 }]}
+            textStyle={{ color: portionGrams === 100 ? theme.colors.onPrimary : theme.colors.onSurface }}
+          >
+            100g
+          </Chip>
+          <Chip
+            onPress={() => setPortionGrams(portionGrams + 50)}
+            style={[styles.portionChip, { backgroundColor: theme.colors.elevation.level2 }]}
+            textStyle={{ color: theme.colors.onSurface }}
+          >
+            +50g
+          </Chip>
+          <Chip
+            onPress={() => setPortionGrams(portionGrams + 150)}
+            style={[styles.portionChip, { backgroundColor: theme.colors.elevation.level2 }]}
+            textStyle={{ color: theme.colors.onSurface }}
+          >
+            +150g
+          </Chip>
         </View>
 
         <Text variant="labelLarge" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
