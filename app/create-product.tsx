@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Appbar, Button, Surface, Text, TextInput, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,7 +29,8 @@ export default function CreateProductScreen() {
         <Appbar.Action icon="close" style={{ opacity: 0 }} />
       </Appbar.Header>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={0}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.onBackground }]}>
           Create Product
         </Text>
@@ -113,6 +114,7 @@ export default function CreateProductScreen() {
           />
         </Surface>
       </ScrollView>
+      </KeyboardAvoidingView>
 
       <Button
         mode="contained"
@@ -130,6 +132,7 @@ export default function CreateProductScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  flex: { flex: 1 },
   appbarTitle: { fontWeight: 'bold', letterSpacing: 2, textAlign: 'center' },
   content: { padding: 24 },
   title: { fontWeight: 'bold' },
