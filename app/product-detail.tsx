@@ -64,7 +64,7 @@ export default function ProductDetailScreen() {
         )}
 
         <Text variant="labelLarge" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
-          PORTION SIZE
+          PORTION SIZE — {portionGrams}g
         </Text>
         <View style={styles.portionRow}>
           {PORTION_OPTIONS.map((g, i) => (
