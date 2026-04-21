@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { StyleSheet, View, Alert } from 'react-native';
 import { Text, Button, useTheme } from 'react-native-paper';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { getProductByBarcode } from '@/services/open-food-facts';
 
 export default function ScanScreen() {
@@ -10,6 +10,11 @@ export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanning, setScanning] = useState(true);
   const lastScannedRef = useRef<string | null>(null);
+
+  useFocusEffect(useCallback(() => {
+    setScanning(true);
+    lastScannedRef.current = null;
+  }, []));
 
   if (!permission) return null;
 
@@ -46,7 +51,7 @@ export default function ScanScreen() {
         'Produkt nicht gefunden',
         `Barcode ${data} ist nicht in der Datenbank.`,
         [
-          { text: 'Nochmal', onPress: () => { setScanning(true); lastScannedRef.current = null; } },
+          { text: 'OK', onPress: () => { setScanning(true); lastScannedRef.current = null; } },
           { text: 'Selbst anlegen', onPress: () => router.push('/create-product') },
         ],
       );
@@ -91,15 +96,6 @@ export default function ScanScreen() {
         PRODUKT SELBST ANLEGEN
       </Button>
 
-      {!scanning && (
-        <Button
-          mode="text"
-          onPress={() => { setScanning(true); lastScannedRef.current = null; }}
-          style={styles.retryButton}
-        >
-          Erneut scannen
-        </Button>
-      )}
     </View>
   );
 }
@@ -121,5 +117,4 @@ const styles = StyleSheet.create({
   cornerBottomLeft: { bottom: 0, left: 0, borderBottomWidth: CORNER_WIDTH, borderLeftWidth: CORNER_WIDTH },
   cornerBottomRight: { bottom: 0, right: 0, borderBottomWidth: CORNER_WIDTH, borderRightWidth: CORNER_WIDTH },
   createButton: { alignSelf: 'center', marginTop: 24, marginBottom: 16, borderRadius: 24, paddingHorizontal: 16 },
-  retryButton: { alignSelf: 'center', marginBottom: 16 },
 });
