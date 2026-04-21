@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ScrollView, View, StyleSheet, Image } from 'react-native';
-import { Text, Button, Chip, useTheme, IconButton } from 'react-native-paper';
+import { ScrollView, View, StyleSheet, Image, TextInput as RNTextInput } from 'react-native';
+import { Text, Button, Chip, useTheme, IconButton, Portal, Modal } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Product } from '@/models/product';
@@ -23,6 +23,8 @@ export default function ProductDetailScreen() {
 
   const [portionGrams, setPortionGrams] = useState(100);
   const [selectedMeal, setSelectedMeal] = useState<MealCategory>('breakfast');
+  const [customModalVisible, setCustomModalVisible] = useState(false);
+  const [customInput, setCustomInput] = useState('');
 
   const factor = portionGrams / 100;
   const n = product.nutriments;
@@ -87,6 +89,14 @@ export default function ProductDetailScreen() {
             textStyle={{ color: theme.colors.onSurface }}
           >
             +150g
+          </Chip>
+          <Chip
+            icon="pencil"
+            onPress={() => { setCustomInput(String(portionGrams)); setCustomModalVisible(true); }}
+            style={[styles.portionChip, { backgroundColor: theme.colors.elevation.level2 }]}
+            textStyle={{ color: theme.colors.onSurface }}
+          >
+            Custom
           </Chip>
         </View>
 
@@ -166,6 +176,38 @@ export default function ProductDetailScreen() {
       >
         HINZUFÜGEN
       </Button>
+
+      <Portal>
+        <Modal
+          visible={customModalVisible}
+          onDismiss={() => setCustomModalVisible(false)}
+          contentContainerStyle={[styles.modalContainer, { backgroundColor: theme.colors.elevation.level2 }]}
+        >
+          <Text variant="titleMedium" style={{ color: theme.colors.onBackground, marginBottom: 16 }}>
+            Portion eingeben
+          </Text>
+          <RNTextInput
+            value={customInput}
+            onChangeText={setCustomInput}
+            keyboardType="numeric"
+            placeholder="Gramm"
+            placeholderTextColor={theme.colors.onSurfaceVariant}
+            style={[styles.modalInput, { color: theme.colors.onBackground, borderColor: theme.colors.outline, backgroundColor: theme.colors.elevation.level3 }]}
+            autoFocus
+          />
+          <Button
+            mode="contained"
+            onPress={() => {
+              const val = parseInt(customInput, 10);
+              if (val > 0) setPortionGrams(val);
+              setCustomModalVisible(false);
+            }}
+            style={{ marginTop: 16 }}
+          >
+            Übernehmen
+          </Button>
+        </Modal>
+      </Portal>
     </SafeAreaView>
   );
 }
@@ -187,4 +229,6 @@ const styles = StyleSheet.create({
   nutritionSquare: { width: '47%', aspectRatio: 1, borderRadius: 12, padding: 16, justifyContent: 'center' },
   valueRow: { flexDirection: 'row', alignItems: 'baseline' },
   addButton: { marginHorizontal: 24, marginBottom: 24, borderRadius: 24, paddingVertical: 4 },
+  modalContainer: { margin: 24, padding: 24, borderRadius: 16 },
+  modalInput: { borderWidth: 1, borderRadius: 8, padding: 12, fontSize: 18 },
 });
