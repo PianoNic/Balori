@@ -114,30 +114,35 @@ export default function ProductDetailScreen() {
           NUTRITION FACTS
         </Text>
 
-        <View style={[styles.nutritionCard, { backgroundColor: theme.colors.elevation.level1 }]}>
-          <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>ENERGY</Text>
-          <View style={styles.energyRow}>
-            <Text variant="displaySmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
+        <View style={styles.nutritionGrid}>
+          <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
+            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>ENERGY</Text>
+            <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
               {scaleValue(n.energyKcal100g)}
             </Text>
-            <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}> kcal</Text>
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>kcal</Text>
           </View>
-        </View>
-
-        <View style={styles.macroRow}>
-          <View style={[styles.macroCard, { backgroundColor: theme.colors.elevation.level1 }]}>
+          <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>PROTEIN</Text>
-            <Text variant="titleLarge" style={{ color: theme.colors.onBackground }}>{scaleValue(n.proteins100g)}g</Text>
+            <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
+              {scaleValue(n.proteins100g)}
+            </Text>
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
           </View>
-          <View style={[styles.macroCard, { backgroundColor: theme.colors.elevation.level1 }]}>
+          <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>CARBS</Text>
-            <Text variant="titleLarge" style={{ color: theme.colors.onBackground }}>{scaleValue(n.carbohydrates100g)}g</Text>
+            <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
+              {scaleValue(n.carbohydrates100g)}
+            </Text>
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
           </View>
-        </View>
-
-        <View style={[styles.macroCardWide, { backgroundColor: theme.colors.elevation.level1 }]}>
-          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>FAT</Text>
-          <Text variant="titleLarge" style={{ color: theme.colors.onBackground }}>{scaleValue(n.fat100g)}g</Text>
+          <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
+            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>FAT</Text>
+            <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
+              {scaleValue(n.fat100g)}
+            </Text>
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
+          </View>
         </View>
       </ScrollView>
 
@@ -170,10 +175,7 @@ const styles = StyleSheet.create({
   portionChip: { borderRadius: 20 },
   mealGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24 },
   mealButton: { borderRadius: 12, flex: 1, minWidth: '45%' },
-  nutritionCard: { borderRadius: 12, padding: 16, marginBottom: 12 },
-  energyRow: { flexDirection: 'row', alignItems: 'baseline' },
-  macroRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  macroCard: { flex: 1, borderRadius: 12, padding: 16 },
-  macroCardWide: { borderRadius: 12, padding: 16, marginBottom: 24 },
+  nutritionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
+  nutritionSquare: { width: '47%', aspectRatio: 1, borderRadius: 12, padding: 16, justifyContent: 'center', alignItems: 'center' },
   addButton: { marginHorizontal: 24, marginBottom: 24, borderRadius: 24, paddingVertical: 4 },
 });
