@@ -117,31 +117,39 @@ export default function ProductDetailScreen() {
         <View style={styles.nutritionGrid}>
           <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>ENERGY</Text>
-            <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
-              {scaleValue(n.energyKcal100g)}
-            </Text>
-            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>kcal</Text>
+            <View style={styles.valueRow}>
+              <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
+                {scaleValue(n.energyKcal100g)}
+              </Text>
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}> kcal</Text>
+            </View>
           </View>
           <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>PROTEIN</Text>
-            <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
-              {scaleValue(n.proteins100g)}
-            </Text>
-            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
+            <View style={styles.valueRow}>
+              <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
+                {scaleValue(n.proteins100g)}
+              </Text>
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
+            </View>
           </View>
           <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>CARBS</Text>
-            <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
-              {scaleValue(n.carbohydrates100g)}
-            </Text>
-            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
+            <View style={styles.valueRow}>
+              <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
+                {scaleValue(n.carbohydrates100g)}
+              </Text>
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
+            </View>
           </View>
           <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>FAT</Text>
-            <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
-              {scaleValue(n.fat100g)}
-            </Text>
-            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
+            <View style={styles.valueRow}>
+              <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
+                {scaleValue(n.fat100g)}
+              </Text>
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -176,6 +184,7 @@ const styles = StyleSheet.create({
   mealGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24 },
   mealButton: { borderRadius: 12, flex: 1, minWidth: '45%' },
   nutritionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
-  nutritionSquare: { width: '47%', aspectRatio: 1, borderRadius: 12, padding: 16, justifyContent: 'center', alignItems: 'center' },
+  nutritionSquare: { width: '47%', aspectRatio: 1, borderRadius: 12, padding: 16, justifyContent: 'center' },
+  valueRow: { flexDirection: 'row', alignItems: 'baseline' },
   addButton: { marginHorizontal: 24, marginBottom: 24, borderRadius: 24, paddingVertical: 4 },
 });
