@@ -1,11 +1,12 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { Text, List, Divider, Surface, Switch, useTheme } from 'react-native-paper';
+import { Text, List, Divider, Switch, useTheme } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const theme = useTheme();
 
   return (
-    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text variant="displaySmall" style={styles.title}>
           Settings
@@ -64,7 +65,7 @@ export default function SettingsScreen() {
           />
         </List.Section>
       </ScrollView>
-    </Surface>
+    </SafeAreaView>
   );
 }
 

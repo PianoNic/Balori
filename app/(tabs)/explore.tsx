@@ -1,11 +1,12 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { Text, Card, Chip, Surface, useTheme } from 'react-native-paper';
+import { Text, Card, Chip, useTheme } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ExploreScreen() {
   const theme = useTheme();
 
   return (
-    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text variant="displaySmall" style={styles.title}>
           Explore
@@ -43,7 +44,7 @@ export default function ExploreScreen() {
           </Card.Content>
         </Card>
       </ScrollView>
-    </Surface>
+    </SafeAreaView>
   );
 }
 
