@@ -1,13 +1,13 @@
-import { View, StyleSheet } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import { StyleSheet } from 'react-native';
+import { Surface, Text, useTheme } from 'react-native-paper';
 
 export default function CreateProductScreen() {
   const theme = useTheme();
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Text variant="headlineMedium" style={{ color: theme.colors.onBackground }}>Create Product</Text>
-    </View>
+    </Surface>
   );
 }
 

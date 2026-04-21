@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ScrollView, View, StyleSheet, Image, TextInput as RNTextInput } from 'react-native';
-import { Text, Button, Chip, useTheme, IconButton, Portal, Modal } from 'react-native-paper';
+import { ScrollView, StyleSheet, Image } from 'react-native';
+import { Text, Button, Chip, useTheme, IconButton, Portal, Dialog, TextInput, Surface } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Product } from '@/models/product';
@@ -14,8 +14,6 @@ const MEAL_OPTIONS: { key: MealCategory; label: string; icon: string }[] = [
   { key: 'snack', label: 'SNACK', icon: 'cookie' },
 ];
 
-const PORTION_OPTIONS = [100, 50, 150];
-
 export default function ProductDetailScreen() {
   const theme = useTheme();
   const params = useLocalSearchParams<{ barcode: string; productJson: string }>();
@@ -23,14 +21,14 @@ export default function ProductDetailScreen() {
 
   const [portionGrams, setPortionGrams] = useState(100);
   const [selectedMeal, setSelectedMeal] = useState<MealCategory>('breakfast');
-  const [customModalVisible, setCustomModalVisible] = useState(false);
+  const [customDialogVisible, setCustomDialogVisible] = useState(false);
   const [customInput, setCustomInput] = useState('');
 
   const factor = portionGrams / 100;
   const n = product.nutriments;
 
   function scaleValue(val: number | null): string {
-    if (val === null) return '–';
+    if (val === null) return '--';
     return Math.round(val * factor).toString();
   }
 
@@ -39,10 +37,10 @@ export default function ProductDetailScreen() {
       <IconButton icon="arrow-left" iconColor={theme.colors.onBackground} onPress={() => router.back()} style={styles.backButton} />
 
       <ScrollView contentContainerStyle={styles.content}>
-        {product.imageUrl && (
-          <View style={[styles.imageContainer, { backgroundColor: theme.colors.elevation.level2 }]}>
+        {product.imageUrl ? (
+          <Surface style={styles.imageContainer} elevation={2}>
             <Image source={{ uri: product.imageUrl }} style={styles.productImage} resizeMode="cover" />
-            <View style={styles.imageOverlay}>
+            <Surface style={styles.imageOverlay} elevation={0}>
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>VERIFIED PRODUCT</Text>
               <Text variant="headlineMedium" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
                 {product.name ?? 'Unbekanntes Produkt'}
@@ -50,25 +48,23 @@ export default function ProductDetailScreen() {
               {product.brand && (
                 <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{product.brand}</Text>
               )}
-            </View>
-          </View>
-        )}
-
-        {!product.imageUrl && (
-          <View style={[styles.noImageContainer, { backgroundColor: theme.colors.elevation.level2 }]}>
+            </Surface>
+          </Surface>
+        ) : (
+          <Surface style={styles.noImageContainer} elevation={2}>
             <Text variant="headlineMedium" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
               {product.name ?? 'Unbekanntes Produkt'}
             </Text>
             {product.brand && (
               <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{product.brand}</Text>
             )}
-          </View>
+          </Surface>
         )}
 
         <Text variant="labelLarge" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
           PORTION SIZE — {portionGrams}g
         </Text>
-        <View style={styles.portionRow}>
+        <Surface style={styles.portionRow} elevation={0}>
           <Chip
             onPress={() => setPortionGrams(100)}
             style={[styles.portionChip, { backgroundColor: portionGrams === 100 ? theme.colors.primary : theme.colors.elevation.level2 }]}
@@ -92,18 +88,18 @@ export default function ProductDetailScreen() {
           </Chip>
           <Chip
             icon="pencil"
-            onPress={() => { setCustomInput(String(portionGrams)); setCustomModalVisible(true); }}
+            onPress={() => { setCustomInput(String(portionGrams)); setCustomDialogVisible(true); }}
             style={[styles.portionChip, { backgroundColor: theme.colors.elevation.level2 }]}
             textStyle={{ color: theme.colors.onSurface }}
           >
             Custom
           </Chip>
-        </View>
+        </Surface>
 
         <Text variant="labelLarge" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
           MEAL
         </Text>
-        <View style={styles.mealGrid}>
+        <Surface style={styles.mealGrid} elevation={0}>
           {MEAL_OPTIONS.map(({ key, label, icon }) => (
             <Button
               key={key}
@@ -118,50 +114,27 @@ export default function ProductDetailScreen() {
               {label}
             </Button>
           ))}
-        </View>
+        </Surface>
 
         <Text variant="labelLarge" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
           NUTRITION FACTS
         </Text>
-
-        <View style={styles.nutritionGrid}>
-          <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
-            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>ENERGY</Text>
-            <View style={styles.valueRow}>
-              <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
-                {scaleValue(n.energyKcal100g)}
-              </Text>
-              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}> kcal</Text>
-            </View>
-          </View>
-          <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
-            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>PROTEIN</Text>
-            <View style={styles.valueRow}>
-              <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
-                {scaleValue(n.proteins100g)}
-              </Text>
-              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
-            </View>
-          </View>
-          <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
-            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>CARBS</Text>
-            <View style={styles.valueRow}>
-              <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
-                {scaleValue(n.carbohydrates100g)}
-              </Text>
-              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
-            </View>
-          </View>
-          <View style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level1 }]}>
-            <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>FAT</Text>
-            <View style={styles.valueRow}>
-              <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
-                {scaleValue(n.fat100g)}
-              </Text>
-              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>g</Text>
-            </View>
-          </View>
-        </View>
+        <Surface style={styles.nutritionGrid} elevation={0}>
+          {[
+            { label: 'ENERGY', value: scaleValue(n.energyKcal100g), unit: 'kcal' },
+            { label: 'PROTEIN', value: scaleValue(n.proteins100g), unit: 'g' },
+            { label: 'CARBS', value: scaleValue(n.carbohydrates100g), unit: 'g' },
+            { label: 'FAT', value: scaleValue(n.fat100g), unit: 'g' },
+          ].map(({ label, value, unit }) => (
+            <Surface key={label} style={styles.nutritionSquare} elevation={1}>
+              <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>{label}</Text>
+              <Surface style={styles.valueRow} elevation={0}>
+                <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>{value}</Text>
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}> {unit}</Text>
+              </Surface>
+            </Surface>
+          ))}
+        </Surface>
       </ScrollView>
 
       <Button
@@ -174,39 +147,34 @@ export default function ProductDetailScreen() {
         style={[styles.addButton, { backgroundColor: theme.colors.primary }]}
         labelStyle={{ color: theme.colors.onPrimary, letterSpacing: 1, fontWeight: 'bold' }}
       >
-        HINZUFÜGEN
+        HINZUFUGEN
       </Button>
 
       <Portal>
-        <Modal
-          visible={customModalVisible}
-          onDismiss={() => setCustomModalVisible(false)}
-          contentContainerStyle={[styles.modalContainer, { backgroundColor: theme.colors.elevation.level2 }]}
-        >
-          <Text variant="titleMedium" style={{ color: theme.colors.onBackground, marginBottom: 16 }}>
-            Portion eingeben
-          </Text>
-          <RNTextInput
-            value={customInput}
-            onChangeText={setCustomInput}
-            keyboardType="numeric"
-            placeholder="Gramm"
-            placeholderTextColor={theme.colors.onSurfaceVariant}
-            style={[styles.modalInput, { color: theme.colors.onBackground, borderColor: theme.colors.outline, backgroundColor: theme.colors.elevation.level3 }]}
-            autoFocus
-          />
-          <Button
-            mode="contained"
-            onPress={() => {
+        <Dialog visible={customDialogVisible} onDismiss={() => setCustomDialogVisible(false)}>
+          <Dialog.Title>Portion eingeben</Dialog.Title>
+          <Dialog.Content>
+            <TextInput
+              value={customInput}
+              onChangeText={setCustomInput}
+              keyboardType="numeric"
+              mode="outlined"
+              label="Gramm"
+              right={<TextInput.Affix text="g" />}
+              autoFocus
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setCustomDialogVisible(false)}>Abbrechen</Button>
+            <Button onPress={() => {
               const val = parseInt(customInput, 10);
               if (val > 0) setPortionGrams(val);
-              setCustomModalVisible(false);
-            }}
-            style={{ marginTop: 16 }}
-          >
-            Übernehmen
-          </Button>
-        </Modal>
+              setCustomDialogVisible(false);
+            }}>
+              Übernehmen
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
     </SafeAreaView>
   );
@@ -221,14 +189,12 @@ const styles = StyleSheet.create({
   imageOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, backgroundColor: 'rgba(0,0,0,0.5)' },
   noImageContainer: { borderRadius: 16, padding: 24, marginBottom: 24 },
   sectionLabel: { marginBottom: 12, letterSpacing: 1 },
-  portionRow: { flexDirection: 'row', gap: 8, marginBottom: 24 },
+  portionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24, backgroundColor: 'transparent' },
   portionChip: { borderRadius: 20 },
-  mealGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24 },
+  mealGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24, backgroundColor: 'transparent' },
   mealButton: { borderRadius: 12, flex: 1, minWidth: '45%' },
-  nutritionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
+  nutritionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24, backgroundColor: 'transparent' },
   nutritionSquare: { width: '47%', aspectRatio: 1, borderRadius: 12, padding: 16, justifyContent: 'center' },
-  valueRow: { flexDirection: 'row', alignItems: 'baseline' },
+  valueRow: { flexDirection: 'row', alignItems: 'baseline', backgroundColor: 'transparent' },
   addButton: { marginHorizontal: 24, marginBottom: 24, borderRadius: 24, paddingVertical: 4 },
-  modalContainer: { margin: 24, padding: 24, borderRadius: 16 },
-  modalInput: { borderWidth: 1, borderRadius: 8, padding: 12, fontSize: 18 },
 });
