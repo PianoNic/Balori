@@ -1,39 +1,65 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, ThemeProvider, type Theme } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { PaperProvider } from 'react-native-paper';
+import { useFonts } from 'expo-font';
 import {
-  PaperProvider,
-  MD3DarkTheme,
-  MD3LightTheme,
-  adaptNavigationTheme,
-} from 'react-native-paper';
+  Epilogue_400Regular,
+  Epilogue_500Medium,
+  Epilogue_600SemiBold,
+  Epilogue_700Bold,
+} from '@expo-google-fonts/epilogue';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { baloriTheme } from '@/constants/theme';
 
-const { LightTheme, DarkTheme: AdaptedDarkTheme } = adaptNavigationTheme({
-  reactNavigationLight: DefaultTheme,
-  reactNavigationDark: DarkTheme,
-});
+SplashScreen.preventAutoHideAsync();
+
+const navigationTheme: Theme = {
+  ...DarkTheme,
+  dark: true,
+  colors: {
+    ...DarkTheme.colors,
+    background: '#1A1918',
+    card: '#242220',
+    text: '#D8C7B5',
+    border: '#3A3836',
+    primary: '#D8C7B5',
+  },
+};
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const [fontsLoaded] = useFonts({
+    Epilogue_400Regular,
+    Epilogue_500Medium,
+    Epilogue_600SemiBold,
+    Epilogue_700Bold,
+  });
 
-  const paperTheme = colorScheme === 'dark' ? MD3DarkTheme : MD3LightTheme;
-  const navigationTheme = colorScheme === 'dark' ? AdaptedDarkTheme : LightTheme;
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
-    <PaperProvider theme={paperTheme}>
+    <PaperProvider theme={baloriTheme}>
       <ThemeProvider value={navigationTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
-        <StatusBar style="auto" />
+        <StatusBar style="light" />
       </ThemeProvider>
     </PaperProvider>
   );
