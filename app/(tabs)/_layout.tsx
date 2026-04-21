@@ -14,7 +14,6 @@ export default function TabLayout() {
         <BottomNavigation.Bar
           navigationState={state}
           safeAreaInsets={insets}
-          style={{ backgroundColor: theme.colors.background }}
           onTabPress={({ route, preventDefault }) => {
             const event = navigation.emit({
               type: 'tabPress',
