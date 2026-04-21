@@ -1,7 +1,7 @@
-import { Tabs } from 'expo-router';
-import { BottomNavigation } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
+import { Tabs } from 'expo-router';
+import { BottomNavigation } from 'react-native-paper';
 
 export default function TabLayout() {
   return (
@@ -44,27 +44,36 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Fuel',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" size={size} color={color} />
+            <MaterialCommunityIcons name="fire" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="scan" // Route wurde von 'add' auf 'scan' geändert
         options={{
-          title: 'Explore',
+          title: 'Scan',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="compass" size={size} color={color} />
+            <MaterialCommunityIcons name="barcode-scan" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="products"
         options={{
-          title: 'Settings',
+          title: 'Products',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="cog" size={size} color={color} />
+            <MaterialCommunityIcons name="format-list-bulleted" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="trend"
+        options={{
+          title: 'Trend',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="trending-up" size={size} color={color} />
           ),
         }}
       />
