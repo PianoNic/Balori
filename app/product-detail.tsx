@@ -87,7 +87,6 @@ export default function ProductDetailScreen() {
             +150g
           </Chip>
           <Chip
-            icon="pencil"
             onPress={() => { setCustomInput(String(portionGrams)); setCustomDialogVisible(true); }}
             style={[styles.portionChip, { backgroundColor: theme.colors.elevation.level2 }]}
             textStyle={{ color: theme.colors.onSurface }}
