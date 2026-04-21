@@ -1,50 +1,37 @@
-# Welcome to your Expo app 👋
+<p align="center">
+  <img src="./assets/images/icon.svg" width="120" alt="Balori Logo">
+</p>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<h1 align="center">Balori</h1>
 
-## Get started
+<p align="center">
+  <strong>A mobile app built with Expo, React Native, and Material Design 3.</strong>
+</p>
 
-1. Install dependencies
+<p align="center">
+  <a href="https://github.com/PianoNic/Balori/stargazers"><img src="https://img.shields.io/github/stars/PianoNic/Balori?style=flat&color=D8C7B5" alt="Stars"/></a>
+  <a href="https://github.com/PianoNic/Balori/releases"><img src="https://img.shields.io/github/v/release/PianoNic/Balori?include_prereleases&color=D8C7B5&label=Latest" alt="Release"/></a>
+</p>
 
-   ```bash
-   npm install
-   ```
+## Tech stack
 
-2. Start the app
+Expo SDK 54 • React Native 0.81 • React Native Paper • TypeScript • Expo Router • Epilogue font
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Setup
 
 ```bash
-npm run reset-project
+bun install
+bun run start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Also works with `npm install` / `npm run start`.
 
-## Learn more
+For Expo Go on a physical device, use `--tunnel` if not on the same network.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Contributing
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Before opening an issue or PR, please read [`CLAUDE.md`](CLAUDE.md).
 
-## Join the community
+## License
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+[MIT](LICENSE)
