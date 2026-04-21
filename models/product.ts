@@ -15,6 +15,8 @@ export interface Product {
   nutrientLevels: NutrientLevels;
 }
 
-export type ProductResult =
-  | { found: true; product: Product }
-  | { found: false; barcode: string };
+export interface ProductResult {
+  found: boolean;
+  barcode: string;
+  product: Product | null;
+}

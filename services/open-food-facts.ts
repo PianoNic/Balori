@@ -52,14 +52,14 @@ export async function getProductByBarcode(barcode: string): Promise<ProductResul
   const response = await fetch(url);
 
   if (!response.ok) {
-    return { found: false, barcode };
+    return { found: false, barcode, product: null };
   }
 
   const data = await response.json();
 
   if (data.status !== 1 || !data.product) {
-    return { found: false, barcode };
+    return { found: false, barcode, product: null };
   }
 
-  return { found: true, product: mapProduct(barcode, data.product) };
+  return { found: true, barcode, product: mapProduct(barcode, data.product) };
 }
