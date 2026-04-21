@@ -64,7 +64,7 @@ export default function ProductDetailScreen() {
         )}
 
         <Text variant="labelLarge" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
-          ⚖ PORTION SIZE
+          PORTION SIZE
         </Text>
         <View style={styles.portionRow}>
           {PORTION_OPTIONS.map((g, i) => (
@@ -81,7 +81,7 @@ export default function ProductDetailScreen() {
         </View>
 
         <Text variant="labelLarge" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
-          🍽 MEAL
+          MEAL
         </Text>
         <View style={styles.mealGrid}>
           {MEAL_OPTIONS.map(({ key, label, icon }) => (
@@ -101,7 +101,7 @@ export default function ProductDetailScreen() {
         </View>
 
         <Text variant="labelLarge" style={[styles.sectionLabel, { color: theme.colors.onSurfaceVariant }]}>
-          📊 NUTRITION FACTS
+          NUTRITION FACTS
         </Text>
 
         <View style={[styles.nutritionCard, { backgroundColor: theme.colors.elevation.level1 }]}>
