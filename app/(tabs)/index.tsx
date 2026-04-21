@@ -1,13 +1,13 @@
-import { StyleSheet } from 'react-native';
-import { Text, Button, Surface, useTheme } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Text, Button, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const theme = useTheme();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Surface style={styles.content}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
+      <View style={styles.content}>
         <Text variant="displaySmall" style={styles.title}>
           Balori
         </Text>
@@ -17,7 +17,7 @@ export default function HomeScreen() {
         <Button mode="contained" onPress={() => {}} style={styles.button}>
           Get Started
         </Button>
-      </Surface>
+      </View>
     </SafeAreaView>
   );
 }

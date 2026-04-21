@@ -6,7 +6,7 @@ export default function ExploreScreen() {
   const theme = useTheme();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text variant="displaySmall" style={styles.title}>
           Explore
