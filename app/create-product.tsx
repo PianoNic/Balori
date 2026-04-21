@@ -23,13 +23,13 @@ export default function CreateProductScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.background }} statusBarHeight={0}>
         <Appbar.Action icon="close" onPress={() => router.back()} />
         <Appbar.Content title="BALORI" titleStyle={styles.appbarTitle} />
         <Appbar.Action icon="close" style={{ opacity: 0 }} />
       </Appbar.Header>
 
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={0}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.onBackground }]}>
           Create Product
@@ -113,19 +113,18 @@ export default function CreateProductScreen() {
             style={styles.input}
           />
         </Surface>
+        <Button
+          mode="contained"
+          icon="content-save"
+          onPress={handleSave}
+          disabled={!canSave}
+          style={[styles.saveButton, { backgroundColor: canSave ? theme.colors.primary : theme.colors.surfaceDisabled }]}
+          labelStyle={{ color: canSave ? theme.colors.onPrimary : theme.colors.onSurfaceDisabled, letterSpacing: 1, fontWeight: 'bold' }}
+        >
+          SPEICHERN
+        </Button>
       </ScrollView>
       </KeyboardAvoidingView>
-
-      <Button
-        mode="contained"
-        icon="content-save"
-        onPress={handleSave}
-        disabled={!canSave}
-        style={[styles.saveButton, { backgroundColor: canSave ? theme.colors.primary : theme.colors.surfaceDisabled }]}
-        labelStyle={{ color: canSave ? theme.colors.onPrimary : theme.colors.onSurfaceDisabled, letterSpacing: 1, fontWeight: 'bold' }}
-      >
-        SPEICHERN
-      </Button>
     </SafeAreaView>
   );
 }
@@ -141,5 +140,5 @@ const styles = StyleSheet.create({
   input: { marginBottom: 12 },
   macroRow: { flexDirection: 'row', gap: 8, backgroundColor: 'transparent' },
   macroInput: { flex: 1 },
-  saveButton: { marginHorizontal: 24, marginBottom: 24, borderRadius: 24, paddingVertical: 4 },
+  saveButton: { marginTop: 4, marginBottom: 24, borderRadius: 24, paddingVertical: 4 },
 });
