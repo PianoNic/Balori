@@ -16,9 +16,11 @@ bun run web            # web only
 
 For Expo Go on a physical device, SDK 54 is required (SDK 55 not yet supported by current Expo Go versions).
 
-## Conventions
+## Workflow rules (enforced)
 
-- Branch: `feature/<issue#>_PascalCase` or `fix/<issue#>_PascalCase`. Always a GitHub issue first.
-- Commit subject: short imperative, no AI attribution.
-- Squash merge.
-- PR labels: `bug`, `enhancement`, `refactor`, `stale`.
+- **Never work on `main`.** Create an issue (labeled) → branch `feature/<issue#>_PascalCase` or `fix/<issue#>_PascalCase` → PR (labeled) with `Closes #<issue>` → squash-merge + delete branch.
+- **Use CLI generators whenever one exists.** `npx create-expo-app`, `npx expo install`, `gh issue create`, `gh pr create`, etc.
+- **No AI / Claude attribution** in commits or PRs. Ever.
+- **No test plans in PRs.** PR body is Summary + `Closes #<issue>` only.
+- **Commit subject**: short imperative.
+- **PR labels**: `bug`, `enhancement`, `refactor`, `stale`.
