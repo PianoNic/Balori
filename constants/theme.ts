@@ -1,53 +1,59 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+import { MD3DarkTheme } from 'react-native-paper';
+import type { MD3Theme } from 'react-native-paper';
 
-import { Platform } from 'react-native';
+export const baloriTheme: MD3Theme = {
+  ...MD3DarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    primary: '#D8C7B5',
+    onPrimary: '#1A1918',
+    primaryContainer: '#4A3F36',
+    onPrimaryContainer: '#D8C7B5',
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+    secondary: '#67625C',
+    onSecondary: '#FFFFFF',
+    secondaryContainer: '#4A4540',
+    onSecondaryContainer: '#D8C7B5',
 
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    tertiary: '#5175C3',
+    onTertiary: '#FFFFFF',
+    tertiaryContainer: '#3A5A9E',
+    onTertiaryContainer: '#C8D6F0',
+
+    background: '#1A1918',
+    onBackground: '#D8C7B5',
+
+    surface: '#1A1918',
+    onSurface: '#D8C7B5',
+    surfaceVariant: '#2A2827',
+    onSurfaceVariant: '#9B9590',
+
+    outline: '#67625C',
+    outlineVariant: '#3A3836',
+
+    elevation: {
+      level0: 'transparent',
+      level1: '#242220',
+      level2: '#2A2827',
+      level3: '#312F2D',
+      level4: '#333130',
+      level5: '#383634',
+    },
+
+    error: '#FFB4AB',
+    onError: '#690005',
+    errorContainer: '#93000A',
+    onErrorContainer: '#FFB4AB',
+
+    inverseSurface: '#D8C7B5',
+    inverseOnSurface: '#1A1918',
+    inversePrimary: '#5C4F44',
+
+    shadow: '#000000',
+    scrim: '#000000',
+    backdrop: 'rgba(0, 0, 0, 0.5)',
+
+    surfaceDisabled: 'rgba(216, 199, 181, 0.12)',
+    onSurfaceDisabled: 'rgba(216, 199, 181, 0.38)',
   },
 };
-
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
