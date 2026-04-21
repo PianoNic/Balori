@@ -125,7 +125,7 @@ export default function ProductDetailScreen() {
             { label: 'CARBS', value: scaleValue(n.carbohydrates100g), unit: 'g' },
             { label: 'FAT', value: scaleValue(n.fat100g), unit: 'g' },
           ].map(({ label, value, unit }) => (
-            <Surface key={label} style={styles.nutritionSquare} elevation={1}>
+            <Surface key={label} style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level2 }]} elevation={0}>
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>{label}</Text>
               <Surface style={styles.valueRow} elevation={0}>
                 <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>{value}</Text>
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   mealGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24, backgroundColor: 'transparent' },
   mealButton: { borderRadius: 12, flex: 1, minWidth: '45%' },
   nutritionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24, backgroundColor: 'transparent' },
-  nutritionSquare: { width: '47%', aspectRatio: 1, borderRadius: 12, padding: 16, justifyContent: 'center' },
+  nutritionSquare: { width: '47%', aspectRatio: 1, borderRadius: 12, padding: 16, justifyContent: 'center', alignItems: 'center' },
   valueRow: { flexDirection: 'row', alignItems: 'baseline', backgroundColor: 'transparent' },
   addButton: { marginHorizontal: 24, marginBottom: 24, borderRadius: 24, paddingVertical: 4 },
 });
