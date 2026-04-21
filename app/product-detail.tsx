@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   mealGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24, backgroundColor: 'transparent' },
   mealButton: { borderRadius: 12, flex: 1, minWidth: '45%' },
   nutritionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24, backgroundColor: 'transparent', justifyContent: 'center' },
-  nutritionSquare: { width: '47%', height: 120, borderRadius: 12, padding: 16, justifyContent: 'center', alignItems: 'center' },
+  nutritionSquare: { width: '47%', height: 80, borderRadius: 12, padding: 12, justifyContent: 'center', alignItems: 'center' },
   valueRow: { flexDirection: 'row', alignItems: 'baseline', backgroundColor: 'transparent' },
   addButton: { marginHorizontal: 24, marginBottom: 24, borderRadius: 24, paddingVertical: 4 },
 });
