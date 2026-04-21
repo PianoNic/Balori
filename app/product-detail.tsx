@@ -150,7 +150,7 @@ export default function ProductDetailScreen() {
       </Button>
 
       <Portal>
-        <Dialog visible={customDialogVisible} onDismiss={() => setCustomDialogVisible(false)}>
+        <Dialog visible={customDialogVisible} onDismiss={() => setCustomDialogVisible(false)} style={{ backgroundColor: theme.colors.surface }}>
           <Dialog.Title>Portion eingeben</Dialog.Title>
           <Dialog.Content>
             <TextInput

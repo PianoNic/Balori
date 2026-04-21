@@ -97,7 +97,7 @@ export default function ScanScreen() {
       </Button>
 
       <Portal>
-        <Dialog visible={notFoundBarcode !== null} onDismiss={dismissNotFound}>
+        <Dialog visible={notFoundBarcode !== null} onDismiss={dismissNotFound} style={{ backgroundColor: theme.colors.surface }}>
           <Dialog.Title>Produkt nicht gefunden</Dialog.Title>
           <Dialog.Content>
             <Text variant="bodyMedium">Barcode {notFoundBarcode} ist nicht in der Datenbank.</Text>
