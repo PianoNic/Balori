@@ -4,8 +4,8 @@ import { Text, Button, Chip, useTheme, IconButton, Portal, Dialog, TextInput, Su
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Product } from '@/models/product';
-
-type MealCategory = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+import type { MealCategory } from '@/models/meal-entry';
+import { addMealItem, generateId } from '@/services/storage';
 
 const MEAL_OPTIONS: { key: MealCategory; label: string; icon: string }[] = [
   { key: 'breakfast', label: 'BREAKFAST', icon: 'weather-sunset-up' },
@@ -139,8 +139,17 @@ export default function ProductDetailScreen() {
       <Button
         mode="contained"
         icon="plus"
-        onPress={() => {
-          // TODO: persist to MMKV storage
+        onPress={async () => {
+          await addMealItem(selectedMeal, {
+            id: generateId(),
+            name: product.name ?? 'Unbekannt',
+            barcode: product.barcode,
+            amountGrams: portionGrams,
+            kcal: Math.round((n.energyKcal100g ?? 0) * factor),
+            protein: Math.round((n.proteins100g ?? 0) * factor),
+            carbs: Math.round((n.carbohydrates100g ?? 0) * factor),
+            fat: Math.round((n.fat100g ?? 0) * factor),
+          });
           router.back();
         }}
         style={[styles.addButton, { backgroundColor: theme.colors.primary }]}

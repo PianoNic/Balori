@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Avatar, Button, Card, Dialog, Divider, List, Portal, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import Svg, { Circle } from 'react-native-svg';
+import { getDayLog, getDayTotals, getGoals, setGoal, removeMealItem } from '@/services/storage';
+import type { MealCategory, MealItem } from '@/models/meal-entry';
 
 const ProgressCircle = ({ size, progress, strokeWidth, color, backgroundColor, children }: any) => {
   const radius = (size - strokeWidth) / 2;
@@ -41,59 +44,51 @@ export default function FuelScreen() {
   const mainCircleSize = Math.min(screenWidth * 0.55, 280); 
   const macroCircleSize = Math.min(screenWidth * 0.22, 100);
 
-  const [data, setData] = useState({
-    calories: { current: 1240, goal: 2000, label: 'Calories', unit: 'kcal' },
-    protein: { current: 45, goal: 150, label: 'Protein', unit: 'g' },
-    carbs: { current: 110, goal: 250, label: 'Carbs', unit: 'g' },
-    fat: { current: 30, goal: 70, label: 'Fat', unit: 'g' },
-    meals: {
-      breakfast: { 
-        label: 'Breakfast', icon: 'coffee', calories: 450, protein: 20, carbs: 50, fat: 15,
-        items: [
-          { name: 'Oatmeal', amount: '80g', kcal: 350, protein: 14, carbs: 60, fat: 6 }, 
-          { name: 'Banana', amount: '120g', kcal: 100, protein: 1, carbs: 23, fat: 0 }
-        ]
-      },
-      lunch: { 
-        label: 'Lunch', icon: 'food-apple', calories: 550, protein: 35, carbs: 60, fat: 12,
-        items: [
-          { name: 'Chicken Salad', amount: '350g', kcal: 550, protein: 35, carbs: 60, fat: 12 }
-        ]
-      },
-      dinner: { 
-        label: 'Dinner', icon: 'food-variant', calories: 0, protein: 0, carbs: 0, fat: 0,
-        items: []
-      },
-      snack: { 
-        label: 'Snack', icon: 'cookie', calories: 240, protein: 10, carbs: 20, fat: 8,
-        items: [
-          { name: 'Protein Bar', amount: '60g', kcal: 240, protein: 10, carbs: 20, fat: 8 }
-        ]
-      },
-    }
-  });
+  const MEAL_META: Record<MealCategory, { label: string; icon: string }> = {
+    breakfast: { label: 'Breakfast', icon: 'coffee' },
+    lunch: { label: 'Lunch', icon: 'food-apple' },
+    dinner: { label: 'Dinner', icon: 'food-variant' },
+    snack: { label: 'Snack', icon: 'cookie' },
+  };
 
-  const [editingType, setEditingType] = useState<any>(null);
+  const [goals, setGoalsState] = useState({ calories: 2000, protein: 150, carbs: 250, fat: 70 });
+  const [totals, setTotals] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
+  const [meals, setMeals] = useState((() => ({ breakfast: [], lunch: [], dinner: [], snack: [] } as Record<MealCategory, MealItem[]>))());
+  const [editingType, setEditingType] = useState<string | null>(null);
   const [tempGoal, setTempGoal] = useState('');
+
+  const loadData = useCallback(async () => {
+    const [g, t, log] = await Promise.all([getGoals(), getDayTotals(), getDayLog()]);
+    setGoalsState(g);
+    setTotals(t);
+    setMeals(log.meals);
+  }, []);
+
+  useFocusEffect(useCallback(() => { loadData(); }, [loadData]));
 
   const today = new Date();
   const dateString = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(today);
 
   const openDialog = (type: string) => {
     setEditingType(type);
-    // @ts-ignore
-    setTempGoal(data[type]?.goal > 0 ? data[type].goal.toString() : '');
+    setTempGoal(goals[type as keyof typeof goals]?.toString() ?? '');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editingType) {
       const numGoal = parseInt(tempGoal, 10);
-      setData({ ...data, 
-        // @ts-ignore
-        [editingType]: { ...data[editingType], goal: isNaN(numGoal) ? 0 : numGoal } 
-      });
+      if (!isNaN(numGoal) && numGoal > 0) {
+        await setGoal(editingType as keyof typeof goals, numGoal);
+        setGoalsState(await getGoals());
+      }
     }
     setEditingType(null);
+  };
+
+  const handleRemoveItem = async (category: MealCategory, itemId: string) => {
+    await removeMealItem(category, itemId);
+    setTotals(await getDayTotals());
+    setMeals((await getDayLog()).meals);
   };
 
   return (
@@ -107,14 +102,14 @@ export default function FuelScreen() {
         <View style={styles.content}>
           <Pressable onPress={() => openDialog('calories')} style={styles.mainCircle}>
             <ProgressCircle
-              size={mainCircleSize} 
-              strokeWidth={mainCircleSize * 0.08} 
-              progress={data.calories.goal > 0 ? Math.min(data.calories.current / data.calories.goal, 1) : 0}
+              size={mainCircleSize}
+              strokeWidth={mainCircleSize * 0.08}
+              progress={goals.calories > 0 ? Math.min(totals.calories / goals.calories, 1) : 0}
               color={theme.colors.primary} backgroundColor={theme.colors.surfaceVariant}
             >
-              <Text variant="displayLarge" style={[styles.bold, { color: theme.colors.primary }]}>{data.calories.current}</Text>
+              <Text variant="displayLarge" style={[styles.bold, { color: theme.colors.primary }]}>{totals.calories}</Text>
               <Text variant="titleMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                {data.calories.goal > 0 ? `of ${data.calories.goal} kcal` : 'Set Goal'}
+                {goals.calories > 0 ? `of ${goals.calories} kcal` : 'Set Goal'}
               </Text>
             </ProgressCircle>
           </Pressable>
@@ -123,20 +118,19 @@ export default function FuelScreen() {
             {(['protein', 'carbs', 'fat'] as const).map((key) => (
               <Pressable key={key} onPress={() => openDialog(key)} style={styles.macroItem}>
                 <ProgressCircle
-                  size={macroCircleSize} 
+                  size={macroCircleSize}
                   strokeWidth={macroCircleSize * 0.1}
-                  progress={data[key].goal > 0 ? Math.min(data[key].current / data[key].goal, 1) : 0}
+                  progress={goals[key] > 0 ? Math.min(totals[key] / goals[key], 1) : 0}
                   color={theme.colors.secondary} backgroundColor={theme.colors.surfaceVariant}
                 >
-                  {/* HIER WURDE DAS ZIEL HINZUGEFÜGT */}
                   <Text variant="titleMedium" style={[styles.bold, { color: theme.colors.onSurface, lineHeight: 22 }]}>
-                    {data[key].current}
+                    {totals[key]}
                   </Text>
                   <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, fontSize: 10 }}>
-                    {data[key].goal > 0 ? `/ ${data[key].goal}g` : 'Set'}
+                    {goals[key] > 0 ? `/ ${goals[key]}g` : 'Set'}
                   </Text>
                 </ProgressCircle>
-                <Text variant="labelMedium" style={styles.macroLabel}>{data[key].label}</Text>
+                <Text variant="labelMedium" style={styles.macroLabel}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
               </Pressable>
             ))}
           </View>
@@ -144,70 +138,75 @@ export default function FuelScreen() {
 
         <View style={styles.mealsSection}>
           <Text variant="titleLarge" style={[styles.bold, styles.sectionTitle]}>Meals</Text>
-          {Object.entries(data.meals).map(([key, meal]) => (
-            <Card key={key} style={styles.mealCard} mode="contained">
+          {(Object.keys(MEAL_META) as MealCategory[]).map((category) => {
+            const meta = MEAL_META[category];
+            const items = meals[category];
+            const mealCals = items.reduce((s, i) => s + i.kcal, 0);
+            const mealP = items.reduce((s, i) => s + i.protein, 0);
+            const mealC = items.reduce((s, i) => s + i.carbs, 0);
+            const mealF = items.reduce((s, i) => s + i.fat, 0);
+            return (
+            <Card key={category} style={styles.mealCard} mode="contained">
               <List.Accordion
                 title={
                   <Text variant="titleMedium" style={styles.bold} numberOfLines={1}>
-                    {meal.label}
+                    {meta.label}
                   </Text>
                 }
                 description={
                   <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, paddingTop: 2 }}>
-                    P: {meal.protein}g   •   C: {meal.carbs}g   •   F: {meal.fat}g
+                    P: {mealP}g   •   C: {mealC}g   •   F: {mealF}g
                   </Text>
                 }
-                left={props => (
+                left={() => (
                   <View style={styles.mealLeftIcon}>
-                    <Avatar.Icon 
-                      size={44} 
-                      icon={meal.icon} 
-                      style={{ backgroundColor: theme.colors.primaryContainer }} 
+                    <Avatar.Icon
+                      size={44}
+                      icon={meta.icon}
+                      style={{ backgroundColor: theme.colors.primaryContainer }}
                       color={theme.colors.onPrimaryContainer}
                     />
                   </View>
                 )}
-                right={props => (
+                right={(props: { isExpanded?: boolean }) => (
                   <View style={styles.mealRightSection}>
                     <View style={styles.mealHeaderCalories}>
                        <Text variant="titleMedium" style={[styles.bold, { color: theme.colors.primary }]}>
-                         {meal.calories}
+                         {mealCals}
                        </Text>
                        <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>kcal</Text>
                     </View>
-                    <List.Icon {...props} icon={props.isExpanded ? 'chevron-up' : 'chevron-down'} style={{ margin: 0 }} />
+                    <List.Icon icon={props.isExpanded ? 'chevron-up' : 'chevron-down'} style={{ margin: 0 }} />
                   </View>
                 )}
                 style={styles.accordionBase}
               >
                 <View style={styles.mealExpandedContent}>
-                  {meal.items.map((item, index) => (
-                    <View key={index} style={styles.productContainer}>
+                  {items.map((item: MealItem, index: number) => (
+                    <Pressable key={item.id} onLongPress={() => handleRemoveItem(category, item.id)} style={styles.productContainer}>
                       <View style={styles.productRowMain}>
                         <Text variant="bodyLarge" style={styles.bold}>{item.name}</Text>
                         <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{item.kcal} kcal</Text>
                       </View>
-                      
                       <View style={styles.productRowSub}>
-                        <Text variant="bodyMedium" style={styles.productSubText}>{item.amount}</Text>
+                        <Text variant="bodyMedium" style={styles.productSubText}>{item.amountGrams}g</Text>
                         <Text variant="bodyMedium" style={styles.productSubText}>
                           P: {item.protein}g  •  C: {item.carbs}g  •  F: {item.fat}g
                         </Text>
                       </View>
-                      
-                      {index < meal.items.length - 1 && (
+                      {index < items.length - 1 && (
                          <Divider style={styles.itemDivider} />
                       )}
-                    </View>
+                    </Pressable>
                   ))}
-                  
-                  {meal.items.length === 0 && (
+                  {items.length === 0 && (
                     <Text variant="bodyMedium" style={styles.emptyText}>No entries yet</Text>
                   )}
                 </View>
               </List.Accordion>
             </Card>
-          ))}
+            );
+          })}
         </View>
       </ScrollView>
 

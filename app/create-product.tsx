@@ -3,6 +3,8 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-na
 import { Appbar, Button, Surface, Text, TextInput, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { saveProduct, generateId } from '@/services/storage';
+import type { Product } from '@/models/product';
 
 export default function CreateProductScreen() {
   const theme = useTheme();
@@ -16,8 +18,31 @@ export default function CreateProductScreen() {
 
   const canSave = name.trim().length > 0 && calories.trim().length > 0;
 
-  function handleSave() {
-    // TODO: persist to MMKV storage
+  async function handleSave() {
+    const product: Product = {
+      barcode: `custom_${generateId()}`,
+      name: name.trim(),
+      brand: null,
+      quantity: portionWeight ? `${portionWeight}g` : null,
+      categories: [],
+      imageUrl: null,
+      imageThumbnailUrl: null,
+      nutriments: {
+        energyKcal100g: parseFloat(calories) || 0,
+        proteins100g: parseFloat(protein) || null,
+        carbohydrates100g: parseFloat(carbs) || null,
+        fat100g: parseFloat(fat) || null,
+        saturatedFat100g: null,
+        sugars100g: null,
+        fiber100g: null,
+        salt100g: null,
+        sodium100g: null,
+      },
+      nutriScore: null,
+      novaGroup: null,
+      nutrientLevels: { fat: null, saturatedFat: null, sugars: null, salt: null },
+    };
+    await saveProduct(product);
     router.back();
   }
 
