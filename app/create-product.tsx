@@ -14,7 +14,6 @@ export default function CreateProductScreen() {
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
-  const [portionWeight, setPortionWeight] = useState('');
 
   const canSave = name.trim().length > 0 && calories.trim().length > 0;
 
@@ -23,7 +22,7 @@ export default function CreateProductScreen() {
       barcode: `custom_${generateId()}`,
       name: name.trim(),
       brand: null,
-      quantity: portionWeight ? `${portionWeight}g` : null,
+      quantity: null,
       categories: [],
       imageUrl: null,
       imageThumbnailUrl: null,
@@ -43,7 +42,10 @@ export default function CreateProductScreen() {
       nutrientLevels: { fat: null, saturatedFat: null, sugars: null, salt: null },
     };
     await saveProduct(product);
-    router.back();
+    router.replace({
+      pathname: '/product-detail',
+      params: { barcode: product.barcode, productJson: JSON.stringify(product) },
+    });
   }
 
   return (
@@ -122,22 +124,6 @@ export default function CreateProductScreen() {
           </Surface>
         </Surface>
 
-        <Surface style={[styles.section, { backgroundColor: theme.colors.elevation.level2 }]} elevation={0}>
-          <Text variant="labelLarge" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
-            STANDARD PORTION{' '}
-            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>(optional)</Text>
-          </Text>
-          <TextInput
-            label="Portion weight"
-            placeholder="e.g. 30"
-            value={portionWeight}
-            onChangeText={setPortionWeight}
-            keyboardType="numeric"
-            mode="outlined"
-            right={<TextInput.Affix text="G" />}
-            style={styles.input}
-          />
-        </Surface>
         <Button
           mode="contained"
           icon="content-save"

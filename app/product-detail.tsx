@@ -5,7 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Product } from '@/models/product';
 import type { MealCategory } from '@/models/meal-entry';
-import { addMealItem, generateId } from '@/services/storage';
+import { addMealItem, saveProduct, generateId } from '@/services/storage';
 
 const MEAL_OPTIONS: { key: MealCategory; label: string; icon: string }[] = [
   { key: 'breakfast', label: 'BREAKFAST', icon: 'weather-sunset-up' },
@@ -140,6 +140,7 @@ export default function ProductDetailScreen() {
         mode="contained"
         icon="plus"
         onPress={async () => {
+          await saveProduct(product);
           await addMealItem(selectedMeal, {
             id: generateId(),
             name: product.name ?? 'Unbekannt',
