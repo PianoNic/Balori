@@ -1,12 +1,12 @@
-import React, { useState, useCallback } from 'react';
+import { MealCard } from '@/components/MealCard';
+import { ProgressCircle } from '@/components/ProgressCircle';
+import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
+import { getDayLog, getDayLogs, getDayTotals, getGoals, removeMealItem, updateMealItem } from '@/services/storage';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Button, Dialog, IconButton, Portal, Surface, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from 'expo-router';
-import { getDayLog, getDayTotals, getGoals, getDayLogs, removeMealItem, updateMealItem } from '@/services/storage';
-import { ProgressCircle } from '@/components/ProgressCircle';
-import { MealCard } from '@/components/MealCard';
-import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
 
 const MEAL_META: Record<MealCategory, { label: string; icon: string }> = {
   breakfast: { label: 'Breakfast', icon: 'coffee' },
@@ -153,7 +153,7 @@ export default function TrendScreen() {
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={styles.header}>
           <Text variant="displaySmall" style={[styles.bold, { color: theme.colors.onBackground }]}>
-            Performance
+            Trend
           </Text>
         </View>
 
