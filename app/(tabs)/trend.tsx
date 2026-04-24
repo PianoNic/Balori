@@ -153,7 +153,7 @@ export default function TrendScreen() {
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={styles.header}>
           <Text variant="displaySmall" style={[styles.bold, { color: theme.colors.onBackground }]}>
-            Trend
+            Performance
           </Text>
         </View>
 
