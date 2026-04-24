@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { IconButton, Surface, Text, useTheme } from 'react-native-paper';
+import { Button, Dialog, IconButton, Portal, Surface, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
-import { getDayLog, getDayTotals, getGoals, getDayLogs } from '@/services/storage';
+import { getDayLog, getDayTotals, getGoals, getDayLogs, removeMealItem, updateMealItem } from '@/services/storage';
 import { ProgressCircle } from '@/components/ProgressCircle';
 import { MealCard } from '@/components/MealCard';
 import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
@@ -78,6 +78,13 @@ export default function TrendScreen() {
   const [goals, setGoalsState] = useState<NutritionGoals>({ calories: 2000, protein: 150, carbs: 250, fat: 70 });
   const [meals, setMeals] = useState<Record<MealCategory, MealItem[]>>({ breakfast: [], lunch: [], dinner: [], snack: [] });
   const [streak, setStreak] = useState(0);
+  const [editingMeal, setEditingMeal] = useState<{ category: MealCategory; item: MealItem } | null>(null);
+  const [editMealName, setEditMealName] = useState('');
+  const [editMealAmount, setEditMealAmount] = useState('');
+  const [editMealKcal, setEditMealKcal] = useState('');
+  const [editMealProtein, setEditMealProtein] = useState('');
+  const [editMealCarbs, setEditMealCarbs] = useState('');
+  const [editMealFat, setEditMealFat] = useState('');
 
   const loadDay = useCallback(async (date: string) => {
     const [t, log, g] = await Promise.all([getDayTotals(date), getDayLog(date), getGoals()]);
@@ -97,6 +104,37 @@ export default function TrendScreen() {
       loadStreak();
     }, [selectedDate, loadDay, loadStreak])
   );
+
+  const handleRemoveItem = async (category: MealCategory, itemId: string) => {
+    await removeMealItem(category, itemId, selectedDate);
+    await loadDay(selectedDate);
+  };
+
+  const openEditMeal = (category: MealCategory, item: MealItem) => {
+    setEditingMeal({ category, item });
+    setEditMealName(item.name);
+    setEditMealAmount(item.amountGrams?.toString() || '0');
+    setEditMealKcal(item.kcal.toString());
+    setEditMealProtein(item.protein.toString());
+    setEditMealCarbs(item.carbs.toString());
+    setEditMealFat(item.fat.toString());
+  };
+
+  const saveMealEdit = async () => {
+    if (editingMeal) {
+      await updateMealItem(editingMeal.category, {
+        ...editingMeal.item,
+        name: editMealName,
+        amountGrams: parseFloat(editMealAmount) || 0,
+        kcal: parseInt(editMealKcal, 10) || 0,
+        protein: parseInt(editMealProtein, 10) || 0,
+        carbs: parseInt(editMealCarbs, 10) || 0,
+        fat: parseInt(editMealFat, 10) || 0,
+      }, selectedDate);
+      await loadDay(selectedDate);
+    }
+    setEditingMeal(null);
+  };
 
   const calendarDays = getCalendarDays(viewYear, viewMonth);
 
@@ -239,11 +277,37 @@ export default function TrendScreen() {
               category={category}
               meta={MEAL_META[category]}
               items={meals[category]}
-              onRemoveItem={() => {}}
+              onRemoveItem={handleRemoveItem}
+              onEditItem={openEditMeal}
             />
           ))}
         </View>
       </ScrollView>
+
+      <Portal>
+        <Dialog visible={editingMeal !== null} onDismiss={() => setEditingMeal(null)} style={{ backgroundColor: theme.colors.surface, maxHeight: '80%' }}>
+          <Dialog.Title>Eintrag bearbeiten</Dialog.Title>
+          <Dialog.Content>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <TextInput label="Name" value={editMealName} onChangeText={setEditMealName} mode="outlined" style={styles.inputSpacing} />
+              <View style={styles.inputRow}>
+                <TextInput label="Menge (g/ml)" value={editMealAmount} onChangeText={setEditMealAmount} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
+                <TextInput label="Kalorien (kcal)" value={editMealKcal} onChangeText={setEditMealKcal} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginLeft: 4 }]} />
+              </View>
+              <Text variant="labelLarge" style={{ marginTop: 8, marginBottom: 4, color: theme.colors.onSurfaceVariant }}>Makros (g)</Text>
+              <View style={styles.inputRow}>
+                <TextInput label="Protein" value={editMealProtein} onChangeText={setEditMealProtein} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
+                <TextInput label="Carbs" value={editMealCarbs} onChangeText={setEditMealCarbs} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginHorizontal: 4 }]} />
+                <TextInput label="Fat" value={editMealFat} onChangeText={setEditMealFat} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginLeft: 4 }]} />
+              </View>
+            </ScrollView>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setEditingMeal(null)}>Abbrechen</Button>
+            <Button onPress={saveMealEdit}>Speichern</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 }
@@ -313,4 +377,7 @@ const styles = StyleSheet.create({
 
   mealsSection: { paddingHorizontal: '5%' },
   sectionTitle: { marginBottom: 16, marginLeft: 8 },
+  inputSpacing: { marginBottom: 12 },
+  inputRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
+  flex1: { flex: 1 },
 });
