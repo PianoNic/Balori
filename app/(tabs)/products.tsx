@@ -3,29 +3,10 @@ import { deleteProduct, getProducts, saveProduct } from '@/services/storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
-import Animated, { type SharedValue, useAnimatedStyle, interpolate } from 'react-native-reanimated';
+import { Animated, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 import { Button, Card, Dialog, FAB, Portal, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-function SwipeAction({ drag, color, iconColor, icon, onPress, align }: {
-  drag: SharedValue<number>; color: string; iconColor: string; icon: string; onPress: () => void; align: 'left' | 'right';
-}) {
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: align === 'left'
-      ? interpolate(drag.value, [0, 80], [0.5, 1], 'clamp')
-      : interpolate(drag.value, [-80, 0], [1, 0.5], 'clamp')
-    }],
-  }));
-  return (
-    <Pressable onPress={onPress} style={[styles.swipeAction, align === 'right' && styles.swipeActionRight, { backgroundColor: color }]}>
-      <Animated.View style={animStyle}>
-        <MaterialCommunityIcons name={icon as any} size={24} color={iconColor} />
-      </Animated.View>
-    </Pressable>
-  );
-}
 
 function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
   product: Product;
@@ -35,21 +16,43 @@ function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
   onEdit: () => void;
 }) {
   const theme = useTheme();
-  const swipeRef = useRef<SwipeableMethods>(null);
+  const ref = useRef<Swipeable>(null);
 
   const pKcal = product.nutriments?.energyKcal100g || 0;
   const pPro = product.nutriments?.proteins100g || 0;
   const pCarbs = product.nutriments?.carbohydrates100g || 0;
   const pFat = product.nutriments?.fat100g || 0;
 
-  const handleRemove = () => { swipeRef.current?.close(); onRemove(); };
-  const handleAdd = () => { swipeRef.current?.close(); onAddToMeal(); };
+  const handleRemove = () => { ref.current?.close(); onRemove(); };
+  const handleAdd = () => { ref.current?.close(); onAddToMeal(); };
+
+  const renderLeftActions = (_p: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
+    const scale = dragX.interpolate({ inputRange: [0, 80], outputRange: [0.5, 1], extrapolate: 'clamp' });
+    return (
+      <Pressable onPress={handleRemove} style={[styles.swipeAction, { backgroundColor: theme.colors.error }]}>
+        <Animated.View style={{ transform: [{ scale }] }}>
+          <MaterialCommunityIcons name="delete-outline" size={24} color={theme.colors.onError} />
+        </Animated.View>
+      </Pressable>
+    );
+  };
+
+  const renderRightActions = (_p: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
+    const scale = dragX.interpolate({ inputRange: [-80, 0], outputRange: [1, 0.5], extrapolate: 'clamp' });
+    return (
+      <Pressable onPress={handleAdd} style={[styles.swipeAction, styles.swipeActionRight, { backgroundColor: theme.colors.primary }]}>
+        <Animated.View style={{ transform: [{ scale }] }}>
+          <MaterialCommunityIcons name="plus-circle-outline" size={24} color={theme.colors.onPrimary} />
+        </Animated.View>
+      </Pressable>
+    );
+  };
 
   return (
-    <ReanimatedSwipeable
-      ref={swipeRef}
-      renderLeftActions={(_p, drag) => <SwipeAction drag={drag} color={theme.colors.error} iconColor={theme.colors.onError} icon="delete-outline" onPress={handleRemove} align="left" />}
-      renderRightActions={(_p, drag) => <SwipeAction drag={drag} color={theme.colors.primary} iconColor={theme.colors.onPrimary} icon="plus-circle-outline" onPress={handleAdd} align="right" />}
+    <Swipeable
+      ref={ref}
+      renderLeftActions={renderLeftActions}
+      renderRightActions={renderRightActions}
       overshootLeft={false}
       overshootRight={false}
       friction={2}
@@ -68,7 +71,7 @@ function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
           </Text>
         </View>
       </Pressable>
-    </ReanimatedSwipeable>
+    </Swipeable>
   );
 }
 
@@ -145,22 +148,22 @@ export default function ProductsScreen() {
         </View>
 
         <View style={styles.listSection}>
-          <Card style={styles.listCard} mode="contained">
-            {products.length === 0 ? (
+          {products.length === 0 ? (
+            <View style={[styles.emptyCard, { backgroundColor: theme.colors.elevation.level1 }]}>
               <Text variant="bodyMedium" style={styles.empty}>No products yet</Text>
-            ) : (
-              products.map((product) => (
-                <SwipeableProduct
-                  key={product.barcode}
-                  product={product}
-                  cardBg={cardBg}
-                  onRemove={() => handleRemove(product.barcode)}
-                  onAddToMeal={() => handleAddToMeal(product)}
-                  onEdit={() => openEdit(product)}
+            </View>
+          ) : (
+            products.map((product) => (
+              <SwipeableProduct
+                key={product.barcode}
+                product={product}
+                cardBg={cardBg}
+                onRemove={() => handleRemove(product.barcode)}
+                onAddToMeal={() => handleAddToMeal(product)}
+                onEdit={() => openEdit(product)}
                 />
-              ))
-            )}
-          </Card>
+            ))
+          )}
         </View>
       </ScrollView>
 
@@ -204,11 +207,11 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: '6%', paddingTop: 20, marginBottom: 20 },
   bold: { fontWeight: 'bold' },
   listSection: { paddingHorizontal: '5%' },
-  listCard: { borderRadius: 28, overflow: 'hidden' },
+  emptyCard: { borderRadius: 28, paddingVertical: 20 },
   empty: { fontStyle: 'italic', opacity: 0.5, textAlign: 'center', paddingVertical: 20 },
-  productRow: { paddingHorizontal: 20, paddingVertical: 14, flexDirection: 'row', alignItems: 'center' },
+  productRow: { paddingHorizontal: 20, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', borderRadius: 16, marginBottom: 8 },
   sub: { opacity: 0.7, fontSize: 13 },
-  swipeAction: { flex: 1, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 20 },
+  swipeAction: { flex: 1, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 20, borderRadius: 16 },
   swipeActionRight: { alignItems: 'flex-end', paddingLeft: 0, paddingRight: 20 },
   fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, borderRadius: 30 },
   inputSpacing: { marginBottom: 12 },
