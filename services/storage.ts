@@ -1,8 +1,6 @@
-import { createMMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Product } from '@/models/product';
 import type { MealCategory, MealItem, DayLog, NutritionGoals } from '@/models/meal-entry';
-
-const mmkv = createMMKV({ id: 'balori' });
 
 const KEYS = {
   PRODUCTS: 'products',
@@ -14,57 +12,59 @@ function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function readJSON<T>(key: string, fallback: T): T {
-  const raw = mmkv.getString(key);
+async function readJSON<T>(key: string, fallback: T): Promise<T> {
+  const raw = await AsyncStorage.getItem(key);
   if (!raw) return fallback;
   return JSON.parse(raw) as T;
 }
 
-function writeJSON(key: string, value: unknown): void {
-  mmkv.set(key, JSON.stringify(value));
+async function writeJSON(key: string, value: unknown): Promise<void> {
+  await AsyncStorage.setItem(key, JSON.stringify(value));
 }
 
 // ── Products ──
 
-export function getProducts(): Product[] {
+export async function getProducts(): Promise<Product[]> {
   return readJSON<Product[]>(KEYS.PRODUCTS, []);
 }
 
-export function getProductByBarcode(barcode: string): Product | undefined {
-  return getProducts().find((p) => p.barcode === barcode);
+export async function getProductByBarcode(barcode: string): Promise<Product | undefined> {
+  const products = await getProducts();
+  return products.find((p) => p.barcode === barcode);
 }
 
-export function saveProduct(product: Product): void {
-  const products = getProducts();
+export async function saveProduct(product: Product): Promise<void> {
+  const products = await getProducts();
   const index = products.findIndex((p) => p.barcode === product.barcode);
   if (index >= 0) {
     products[index] = product;
   } else {
     products.push(product);
   }
-  writeJSON(KEYS.PRODUCTS, products);
+  await writeJSON(KEYS.PRODUCTS, products);
 }
 
-export function deleteProduct(barcode: string): void {
-  writeJSON(KEYS.PRODUCTS, getProducts().filter((p) => p.barcode !== barcode));
+export async function deleteProduct(barcode: string): Promise<void> {
+  const products = await getProducts();
+  await writeJSON(KEYS.PRODUCTS, products.filter((p) => p.barcode !== barcode));
 }
 
 // ── Nutrition Goals ──
 
 const DEFAULT_GOALS: NutritionGoals = { calories: 2000, protein: 150, carbs: 250, fat: 70 };
 
-export function getGoals(): NutritionGoals {
+export async function getGoals(): Promise<NutritionGoals> {
   return readJSON<NutritionGoals>(KEYS.GOALS, DEFAULT_GOALS);
 }
 
-export function setGoals(goals: NutritionGoals): void {
-  writeJSON(KEYS.GOALS, goals);
+export async function setGoals(goals: NutritionGoals): Promise<void> {
+  await writeJSON(KEYS.GOALS, goals);
 }
 
-export function setGoal(key: keyof NutritionGoals, value: number): void {
-  const goals = getGoals();
+export async function setGoal(key: keyof NutritionGoals, value: number): Promise<void> {
+  const goals = await getGoals();
   goals[key] = value;
-  setGoals(goals);
+  await setGoals(goals);
 }
 
 // ── Day Logs (meals) ──
@@ -73,25 +73,25 @@ function emptyMeals(): Record<MealCategory, MealItem[]> {
   return { breakfast: [], lunch: [], dinner: [], snack: [] };
 }
 
-export function getDayLog(date?: string): DayLog {
+export async function getDayLog(date?: string): Promise<DayLog> {
   const d = date ?? todayKey();
   return readJSON<DayLog>(KEYS.dayLog(d), { date: d, meals: emptyMeals() });
 }
 
-export function addMealItem(category: MealCategory, item: MealItem, date?: string): void {
-  const log = getDayLog(date);
+export async function addMealItem(category: MealCategory, item: MealItem, date?: string): Promise<void> {
+  const log = await getDayLog(date);
   log.meals[category].push(item);
-  writeJSON(KEYS.dayLog(log.date), log);
+  await writeJSON(KEYS.dayLog(log.date), log);
 }
 
-export function removeMealItem(category: MealCategory, itemId: string, date?: string): void {
-  const log = getDayLog(date);
+export async function removeMealItem(category: MealCategory, itemId: string, date?: string): Promise<void> {
+  const log = await getDayLog(date);
   log.meals[category] = log.meals[category].filter((i) => i.id !== itemId);
-  writeJSON(KEYS.dayLog(log.date), log);
+  await writeJSON(KEYS.dayLog(log.date), log);
 }
 
-export function getDayTotals(date?: string) {
-  const log = getDayLog(date);
+export async function getDayTotals(date?: string) {
+  const log = await getDayLog(date);
   let calories = 0, protein = 0, carbs = 0, fat = 0;
   for (const items of Object.values(log.meals)) {
     for (const item of items) {
@@ -104,8 +104,8 @@ export function getDayTotals(date?: string) {
   return { calories, protein, carbs, fat };
 }
 
-export function getMealTotals(category: MealCategory, date?: string) {
-  const log = getDayLog(date);
+export async function getMealTotals(category: MealCategory, date?: string) {
+  const log = await getDayLog(date);
   const items = log.meals[category];
   let calories = 0, protein = 0, carbs = 0, fat = 0;
   for (const item of items) {
@@ -119,14 +119,14 @@ export function getMealTotals(category: MealCategory, date?: string) {
 
 // ── History ──
 
-export function getDayLogs(days: number): DayLog[] {
+export async function getDayLogs(days: number): Promise<DayLog[]> {
   const logs: DayLog[] = [];
   const now = new Date();
   for (let i = 0; i < days; i++) {
     const d = new Date(now);
     d.setDate(d.getDate() - i);
     const key = d.toISOString().slice(0, 10);
-    logs.push(getDayLog(key));
+    logs.push(await getDayLog(key));
   }
   return logs;
 }
@@ -137,6 +137,6 @@ export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-export function clearAll(): void {
-  mmkv.clearAll();
+export async function clearAll(): Promise<void> {
+  await AsyncStorage.clear();
 }

@@ -139,8 +139,8 @@ export default function ProductDetailScreen() {
       <Button
         mode="contained"
         icon="plus"
-        onPress={() => {
-          addMealItem(selectedMeal, {
+        onPress={async () => {
+          await addMealItem(selectedMeal, {
             id: generateId(),
             name: product.name ?? 'Unbekannt',
             barcode: product.barcode,

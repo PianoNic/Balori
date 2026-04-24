@@ -18,7 +18,7 @@ export default function CreateProductScreen() {
 
   const canSave = name.trim().length > 0 && calories.trim().length > 0;
 
-  function handleSave() {
+  async function handleSave() {
     const product: Product = {
       barcode: `custom_${generateId()}`,
       name: name.trim(),
@@ -42,7 +42,7 @@ export default function CreateProductScreen() {
       novaGroup: null,
       nutrientLevels: { fat: null, saturatedFat: null, sugars: null, salt: null },
     };
-    saveProduct(product);
+    await saveProduct(product);
     router.back();
   }
 

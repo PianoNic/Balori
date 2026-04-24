@@ -51,19 +51,20 @@ export default function FuelScreen() {
     snack: { label: 'Snack', icon: 'cookie' },
   };
 
-  const [goals, setGoalsState] = useState(getGoals());
-  const [totals, setTotals] = useState(getDayTotals());
-  const [meals, setMeals] = useState(getDayLog().meals);
+  const [goals, setGoalsState] = useState({ calories: 2000, protein: 150, carbs: 250, fat: 70 });
+  const [totals, setTotals] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
+  const [meals, setMeals] = useState((() => ({ breakfast: [], lunch: [], dinner: [], snack: [] } as Record<MealCategory, MealItem[]>))());
   const [editingType, setEditingType] = useState<string | null>(null);
   const [tempGoal, setTempGoal] = useState('');
 
-  useFocusEffect(
-    useCallback(() => {
-      setGoalsState(getGoals());
-      setTotals(getDayTotals());
-      setMeals(getDayLog().meals);
-    }, [])
-  );
+  const loadData = useCallback(async () => {
+    const [g, t, log] = await Promise.all([getGoals(), getDayTotals(), getDayLog()]);
+    setGoalsState(g);
+    setTotals(t);
+    setMeals(log.meals);
+  }, []);
+
+  useFocusEffect(useCallback(() => { loadData(); }, [loadData]));
 
   const today = new Date();
   const dateString = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(today);
@@ -73,21 +74,21 @@ export default function FuelScreen() {
     setTempGoal(goals[type as keyof typeof goals]?.toString() ?? '');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editingType) {
       const numGoal = parseInt(tempGoal, 10);
       if (!isNaN(numGoal) && numGoal > 0) {
-        setGoal(editingType as keyof typeof goals, numGoal);
-        setGoalsState(getGoals());
+        await setGoal(editingType as keyof typeof goals, numGoal);
+        setGoalsState(await getGoals());
       }
     }
     setEditingType(null);
   };
 
-  const handleRemoveItem = (category: MealCategory, itemId: string) => {
-    removeMealItem(category, itemId);
-    setTotals(getDayTotals());
-    setMeals(getDayLog().meals);
+  const handleRemoveItem = async (category: MealCategory, itemId: string) => {
+    await removeMealItem(category, itemId);
+    setTotals(await getDayTotals());
+    setMeals((await getDayLog()).meals);
   };
 
   return (
