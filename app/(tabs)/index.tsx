@@ -1,44 +1,15 @@
-import React, { useState, useCallback } from 'react';
-import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { Avatar, Button, Card, Dialog, Divider, List, Portal, Text, TextInput, useTheme } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
+import { getDayLog, getDayTotals, getGoals, removeMealItem, setGoal } from '@/services/storage';
 import { useFocusEffect } from 'expo-router';
-import Svg, { Circle } from 'react-native-svg';
-import { getDayLog, getDayTotals, getGoals, setGoal, removeMealItem } from '@/services/storage';
-import type { MealCategory, MealItem } from '@/models/meal-entry';
-
-const ProgressCircle = ({ size, progress, strokeWidth, color, backgroundColor, children }: any) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - progress * circumference;
-
-  return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Svg width={size} height={size}>
-        <Circle cx={size / 2} cy={size / 2} r={radius} stroke={backgroundColor} strokeWidth={strokeWidth} fill="none" />
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={color}
-          strokeWidth={strokeWidth}
-          fill="none"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          rotation="-90"
-          originX={size / 2}
-          originY={size / 2}
-        />
-      </Svg>
-      <View style={styles.absoluteCenter}>{children}</View>
-    </View>
-  );
-};
+import React, { useCallback, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Button, Dialog, Portal, Text, TextInput, useTheme } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MealCard } from '../../components/MealCard';
+import { ProgressCircle } from '../../components/ProgressCircle';
 
 export default function FuelScreen() {
   const theme = useTheme();
-  
   const { width: screenWidth } = useWindowDimensions();
   
   const mainCircleSize = Math.min(screenWidth * 0.55, 280); 
@@ -51,9 +22,12 @@ export default function FuelScreen() {
     snack: { label: 'Snack', icon: 'cookie' },
   };
 
-  const [goals, setGoalsState] = useState({ calories: 2000, protein: 150, carbs: 250, fat: 70 });
+  const [goals, setGoalsState] = useState<NutritionGoals>({ calories: 2000, protein: 150, carbs: 250, fat: 70 });
   const [totals, setTotals] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
-  const [meals, setMeals] = useState((() => ({ breakfast: [], lunch: [], dinner: [], snack: [] } as Record<MealCategory, MealItem[]>))());
+  const [meals, setMeals] = useState<Record<MealCategory, MealItem[]>>({
+    breakfast: [], lunch: [], dinner: [], snack: []
+  });
+  
   const [editingType, setEditingType] = useState<string | null>(null);
   const [tempGoal, setTempGoal] = useState('');
 
@@ -130,7 +104,9 @@ export default function FuelScreen() {
                     {goals[key] > 0 ? `/ ${goals[key]}g` : 'Set'}
                   </Text>
                 </ProgressCircle>
-                <Text variant="labelMedium" style={styles.macroLabel}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                <Text variant="labelMedium" style={styles.macroLabel}>
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </Text>
               </Pressable>
             ))}
           </View>
@@ -138,79 +114,18 @@ export default function FuelScreen() {
 
         <View style={styles.mealsSection}>
           <Text variant="titleLarge" style={[styles.bold, styles.sectionTitle]}>Meals</Text>
-          {(Object.keys(MEAL_META) as MealCategory[]).map((category) => {
-            const meta = MEAL_META[category];
-            const items = meals[category];
-            const mealCals = items.reduce((s, i) => s + i.kcal, 0);
-            const mealP = items.reduce((s, i) => s + i.protein, 0);
-            const mealC = items.reduce((s, i) => s + i.carbs, 0);
-            const mealF = items.reduce((s, i) => s + i.fat, 0);
-            return (
-            <Card key={category} style={styles.mealCard} mode="contained">
-              <List.Accordion
-                title={
-                  <Text variant="titleMedium" style={styles.bold} numberOfLines={1}>
-                    {meta.label}
-                  </Text>
-                }
-                description={
-                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, paddingTop: 2 }}>
-                    P: {mealP}g   •   C: {mealC}g   •   F: {mealF}g
-                  </Text>
-                }
-                left={() => (
-                  <View style={styles.mealLeftIcon}>
-                    <Avatar.Icon
-                      size={44}
-                      icon={meta.icon}
-                      style={{ backgroundColor: theme.colors.primaryContainer }}
-                      color={theme.colors.onPrimaryContainer}
-                    />
-                  </View>
-                )}
-                right={(props: { isExpanded?: boolean }) => (
-                  <View style={styles.mealRightSection}>
-                    <View style={styles.mealHeaderCalories}>
-                       <Text variant="titleMedium" style={[styles.bold, { color: theme.colors.primary }]}>
-                         {mealCals}
-                       </Text>
-                       <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>kcal</Text>
-                    </View>
-                    <List.Icon icon={props.isExpanded ? 'chevron-up' : 'chevron-down'} style={{ margin: 0 }} />
-                  </View>
-                )}
-                style={styles.accordionBase}
-              >
-                <View style={styles.mealExpandedContent}>
-                  {items.map((item: MealItem, index: number) => (
-                    <Pressable key={item.id} onLongPress={() => handleRemoveItem(category, item.id)} style={styles.productContainer}>
-                      <View style={styles.productRowMain}>
-                        <Text variant="bodyLarge" style={styles.bold}>{item.name}</Text>
-                        <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{item.kcal} kcal</Text>
-                      </View>
-                      <View style={styles.productRowSub}>
-                        <Text variant="bodyMedium" style={styles.productSubText}>{item.amountGrams}g</Text>
-                        <Text variant="bodyMedium" style={styles.productSubText}>
-                          P: {item.protein}g  •  C: {item.carbs}g  •  F: {item.fat}g
-                        </Text>
-                      </View>
-                      {index < items.length - 1 && (
-                         <Divider style={styles.itemDivider} />
-                      )}
-                    </Pressable>
-                  ))}
-                  {items.length === 0 && (
-                    <Text variant="bodyMedium" style={styles.emptyText}>No entries yet</Text>
-                  )}
-                </View>
-              </List.Accordion>
-            </Card>
-            );
-          })}
+          {(Object.keys(MEAL_META) as MealCategory[]).map((category) => (
+            <MealCard 
+              key={category}
+              category={category}
+              meta={MEAL_META[category]}
+              items={meals[category]}
+              onRemoveItem={handleRemoveItem}
+            />
+          ))}
         </View>
       </ScrollView>
 
-      {/* NEUES POP-UP STYLING ÜBERNOMMEN */}
       <Portal>
         <Dialog visible={editingType !== null} onDismiss={() => setEditingType(null)} style={{ backgroundColor: theme.colors.surface }}>
           <Dialog.Title>Set {editingType} Goal</Dialog.Title>
@@ -240,48 +155,11 @@ const styles = StyleSheet.create({
   content: { alignItems: 'center', paddingBottom: 40 },
   mainCircle: { marginBottom: 40 },
   macroRow: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    width: '100%', 
-    paddingHorizontal: '8%',
-    flexWrap: 'wrap' 
+    flexDirection: 'row', justifyContent: 'space-between', 
+    width: '100%', paddingHorizontal: '8%', flexWrap: 'wrap' 
   },
   macroItem: { alignItems: 'center' },
   macroLabel: { marginTop: 8, fontWeight: '600' },
-  absoluteCenter: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
-  
   mealsSection: { paddingHorizontal: '5%' },
   sectionTitle: { marginBottom: 16, marginLeft: 8 },
-  mealCard: { marginBottom: 16, borderRadius: 28, overflow: 'hidden' },
-  
-  accordionBase: { backgroundColor: 'transparent', paddingVertical: 10, paddingHorizontal: 4 },
-  
-  mealLeftIcon: { justifyContent: 'center', marginLeft: 4 },
-  mealRightSection: { flexDirection: 'row', alignItems: 'center', paddingRight: 4 },
-  mealHeaderCalories: { alignItems: 'flex-end', marginRight: 8, justifyContent: 'center' },
-  
-  mealExpandedContent: { paddingHorizontal: 20, paddingBottom: 20, paddingTop: 8 },
-  
-  productContainer: { marginBottom: 4 },
-  productRowMain: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center',
-    marginBottom: 4 
-  },
-  productRowSub: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  productSubText: {
-    opacity: 0.7,
-    fontSize: 13,
-  },
-  itemDivider: { 
-    marginVertical: 12,
-    opacity: 0.5 
-  },
-  
-  emptyText: { fontStyle: 'italic', opacity: 0.5, textAlign: 'center', marginTop: 8 }
 });
