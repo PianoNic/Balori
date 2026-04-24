@@ -1,17 +1,18 @@
-import { DarkTheme, ThemeProvider, type Theme } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { PaperProvider } from 'react-native-paper';
-import { useFonts } from 'expo-font';
+import { baloriTheme } from '@/constants/theme';
 import {
   Epilogue_400Regular,
   Epilogue_500Medium,
   Epilogue_600SemiBold,
   Epilogue_700Bold,
 } from '@expo-google-fonts/epilogue';
+import { DarkTheme, ThemeProvider, type Theme } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { baloriTheme } from '@/constants/theme';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PaperProvider } from 'react-native-paper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,16 +43,18 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <PaperProvider theme={baloriTheme}>
-      <ThemeProvider value={navigationTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="product-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="create-product" options={{ presentation: 'modal', headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        </Stack>
-        <StatusBar style="light" />
-      </ThemeProvider>
-    </PaperProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PaperProvider theme={baloriTheme}>
+        <ThemeProvider value={navigationTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="product-detail" options={{ headerShown: false }} />
+            <Stack.Screen name="create-product" options={{ presentation: 'modal', headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          </Stack>
+          <StatusBar style="light" />
+        </ThemeProvider>
+      </PaperProvider>
+    </GestureHandlerRootView>
   );
 }

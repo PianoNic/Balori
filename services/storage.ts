@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { DayLog, MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
 import type { Product } from '@/models/product';
-import type { MealCategory, MealItem, DayLog, NutritionGoals } from '@/models/meal-entry';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KEYS = {
   PRODUCTS: 'products',
@@ -139,4 +139,14 @@ export function generateId(): string {
 
 export async function clearAll(): Promise<void> {
   await AsyncStorage.clear();
+}
+
+export async function updateMealItem(category: MealCategory, updatedItem: MealItem, date?: string): Promise<void> {
+  const log = await getDayLog(date);
+  const items = log.meals[category];
+  const index = items.findIndex(i => i.id === updatedItem.id);
+  if (index !== -1) {
+    items[index] = updatedItem;
+    await writeJSON(KEYS.dayLog(log.date), log);
+  }
 }
