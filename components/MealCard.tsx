@@ -1,7 +1,8 @@
-import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { Avatar, Card, Divider, IconButton, List, Text, useTheme } from 'react-native-paper';
+import React, { useRef } from 'react';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
+import { Avatar, Card, List, Text, useTheme } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { MealCategory, MealItem } from '../models/meal-entry';
 
 interface MealCardProps {
@@ -9,27 +10,64 @@ interface MealCardProps {
   meta: { label: string; icon: string };
   items: MealItem[];
   onRemoveItem: (category: MealCategory, id: string) => void;
-  onEditItem: (category: MealCategory, item: MealItem) => void;
+  onEditItem?: (category: MealCategory, item: MealItem) => void;
 }
 
-export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], onRemoveItem, onEditItem }) => {
+function SwipeableRow({ item, bg, onRemove, onEdit }: {
+  item: MealItem;
+  bg: string;
+  onRemove: () => void;
+  onEdit?: () => void;
+}) {
   const theme = useTheme();
+  const ref = useRef<Swipeable>(null);
 
-  const mealCals = items.reduce((sum, item) => sum + item.kcal, 0);
-  const mealP = items.reduce((sum, item) => sum + item.protein, 0);
-  const mealC = items.reduce((sum, item) => sum + item.carbs, 0);
-  const mealF = items.reduce((sum, item) => sum + item.fat, 0);
-
-  const renderLeftActions = () => {
+  const renderLeftActions = (_p: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
+    const scale = dragX.interpolate({ inputRange: [0, 80], outputRange: [0.5, 1], extrapolate: 'clamp' });
     return (
-      <View style={[styles.deleteBackground, { backgroundColor: theme.colors.errorContainer }]}>
-        <IconButton icon="delete" iconColor={theme.colors.onErrorContainer} size={24} style={{ margin: 0 }} />
+      <View style={[styles.deleteAction, { backgroundColor: theme.colors.error }]}>
+        <Animated.View style={{ transform: [{ scale }] }}>
+          <MaterialCommunityIcons name="delete-outline" size={24} color={theme.colors.onError} />
+        </Animated.View>
       </View>
     );
   };
 
   return (
-    <Card style={styles.mealCard} mode="contained">
+    <Swipeable
+      ref={ref}
+      renderLeftActions={renderLeftActions}
+      leftThreshold={80}
+      overshootLeft={false}
+      onSwipeableOpen={() => { ref.current?.close(); onRemove(); }}
+    >
+      <Pressable onPress={onEdit} style={[styles.item, { backgroundColor: bg }]}>
+        <View style={styles.itemTop}>
+          <Text variant="bodyLarge" style={styles.bold}>{item.name}</Text>
+          <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{item.kcal} kcal</Text>
+        </View>
+        <View style={styles.itemBottom}>
+          <Text variant="bodyMedium" style={styles.sub}>{item.amountGrams}g</Text>
+          <Text variant="bodyMedium" style={styles.sub}>
+            P: {item.protein}g  •  C: {item.carbs}g  •  F: {item.fat}g
+          </Text>
+        </View>
+      </Pressable>
+    </Swipeable>
+  );
+}
+
+export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], onRemoveItem, onEditItem }) => {
+  const theme = useTheme();
+  const cardBg = theme.colors.elevation.level1;
+
+  const mealCals = items.reduce((s, i) => s + i.kcal, 0);
+  const mealP = items.reduce((s, i) => s + i.protein, 0);
+  const mealC = items.reduce((s, i) => s + i.carbs, 0);
+  const mealF = items.reduce((s, i) => s + i.fat, 0);
+
+  return (
+    <Card style={styles.card} mode="contained">
       <List.Accordion
         title={<Text variant="titleMedium" style={styles.bold} numberOfLines={1}>{meta.label}</Text>}
         description={
@@ -38,89 +76,52 @@ export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], 
           </Text>
         }
         left={() => (
-          <View style={styles.mealLeftIcon}>
-            <Avatar.Icon
-              size={44}
-              icon={meta.icon}
+          <View style={styles.iconWrap}>
+            <Avatar.Icon size={44} icon={meta.icon}
               style={{ backgroundColor: theme.colors.primaryContainer }}
               color={theme.colors.onPrimaryContainer}
             />
           </View>
         )}
         right={(props: { isExpanded?: boolean }) => (
-          <View style={styles.mealRightSection}>
-            <View style={styles.mealHeaderCalories}>
+          <View style={styles.rightSection}>
+            <View style={styles.calSection}>
               <Text variant="titleMedium" style={[styles.bold, { color: theme.colors.primary }]}>{mealCals}</Text>
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>kcal</Text>
             </View>
             <List.Icon icon={props.isExpanded ? 'chevron-up' : 'chevron-down'} style={{ margin: 0 }} />
           </View>
         )}
-        style={styles.accordionBase}
+        style={styles.accordion}
       >
-        <View style={styles.mealExpandedContent}>
-          {items.map((item, index) => (
-            <View key={item.id}>
-              <Swipeable
-                renderLeftActions={renderLeftActions}
-                overshootLeft={false}
-                onSwipeableOpen={(direction) => {
-                  if (direction === 'left') onRemoveItem(category, item.id);
-                }}
-              >
-                {/* Die komplette Zeile ist jetzt ein Button (Pressable) */}
-                <Pressable 
-                  style={[styles.productContainer, { backgroundColor: theme.colors.surfaceVariant }]}
-                  onPress={() => onEditItem(category, item)}
-                >
-                  <View style={styles.productRowMain}>
-                    <Text variant="bodyLarge" style={styles.bold}>{item.name}</Text>
-                    <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{item.kcal} kcal</Text>
-                  </View>
-                  <View style={styles.productRowSub}>
-                    <Text variant="bodyMedium" style={styles.productSubText}>{item.amountGrams}g</Text>
-                    <Text variant="bodyMedium" style={styles.productSubText}>
-                      P: {item.protein}g  •  C: {item.carbs}g  •  F: {item.fat}g
-                    </Text>
-                  </View>
-                </Pressable>
-              </Swipeable>
-              
-              {index < items.length - 1 && <Divider style={styles.itemDivider} />}
-            </View>
-          ))}
-          
-          {items.length === 0 && (
-            <Text variant="bodyMedium" style={styles.emptyText}>No entries yet</Text>
-          )}
-        </View>
+        {items.map((item) => (
+          <SwipeableRow
+            key={item.id}
+            item={item}
+            bg={cardBg}
+            onRemove={() => onRemoveItem(category, item.id)}
+            onEdit={onEditItem ? () => onEditItem(category, item) : undefined}
+          />
+        ))}
       </List.Accordion>
+      {items.length === 0 && (
+        <Text variant="bodyMedium" style={styles.empty}>No entries yet</Text>
+      )}
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
   bold: { fontWeight: 'bold' },
-  mealCard: { marginBottom: 16, borderRadius: 28, overflow: 'hidden' },
-  accordionBase: { backgroundColor: 'transparent', paddingVertical: 10, paddingHorizontal: 4 },
-  mealLeftIcon: { justifyContent: 'center', marginLeft: 4 },
-  mealRightSection: { flexDirection: 'row', alignItems: 'center', paddingRight: 4 },
-  mealHeaderCalories: { alignItems: 'flex-end', marginRight: 8, justifyContent: 'center' },
-  
-  mealExpandedContent: { paddingHorizontal: 0, paddingBottom: 10 }, 
-  productContainer: { paddingHorizontal: 20, paddingVertical: 12 }, 
-  
-  productRowMain: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  productRowSub: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  productSubText: { opacity: 0.7, fontSize: 13 },
-  
-  itemDivider: { marginVertical: 0, opacity: 0.5, marginHorizontal: 20 },
-  emptyText: { fontStyle: 'italic', opacity: 0.5, textAlign: 'center', marginTop: 12, paddingBottom: 12 },
-  
-  deleteBackground: {
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'flex-start', 
-    paddingLeft: 20 
-  }
+  card: { marginBottom: 16, borderRadius: 28, overflow: 'hidden' },
+  accordion: { backgroundColor: 'transparent', paddingVertical: 10, paddingHorizontal: 4 },
+  iconWrap: { justifyContent: 'center', marginLeft: 4 },
+  rightSection: { flexDirection: 'row', alignItems: 'center', paddingRight: 4 },
+  calSection: { alignItems: 'flex-end', marginRight: 8, justifyContent: 'center' },
+  item: { paddingHorizontal: 20, paddingVertical: 14 },
+  itemTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  itemBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  sub: { opacity: 0.7, fontSize: 13 },
+  empty: { fontStyle: 'italic', opacity: 0.5, textAlign: 'center', paddingVertical: 20 },
+  deleteAction: { flex: 1, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 20 },
 });
