@@ -42,10 +42,7 @@ export default function CreateProductScreen() {
       nutrientLevels: { fat: null, saturatedFat: null, sugars: null, salt: null },
     };
     await saveProduct(product);
-    router.replace({
-      pathname: '/product-detail',
-      params: { barcode: product.barcode, productJson: JSON.stringify(product) },
-    });
+    router.back();
   }
 
   return (
