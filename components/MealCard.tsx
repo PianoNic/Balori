@@ -9,8 +9,9 @@ interface MealCardProps {
   category: MealCategory;
   meta: { label: string; icon: string };
   items: MealItem[];
-  onRemoveItem: (category: MealCategory, id: string) => void;
+  onRemoveItem?: (category: MealCategory, id: string) => void;
   onEditItem?: (category: MealCategory, item: MealItem) => void;
+  readOnly?: boolean;
 }
 
 function SwipeableRow({ item, bg, onRemove, onEdit }: {
@@ -57,7 +58,25 @@ function SwipeableRow({ item, bg, onRemove, onEdit }: {
   );
 }
 
-export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], onRemoveItem, onEditItem }) => {
+function ReadOnlyRow({ item }: { item: MealItem }) {
+  const theme = useTheme();
+  return (
+    <View style={styles.item}>
+      <View style={styles.itemTop}>
+        <Text variant="bodyLarge" style={styles.bold}>{item.name}</Text>
+        <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{item.kcal} kcal</Text>
+      </View>
+      <View style={styles.itemBottom}>
+        <Text variant="bodyMedium" style={styles.sub}>{item.amountGrams}g</Text>
+        <Text variant="bodyMedium" style={styles.sub}>
+          P: {item.protein}g  •  C: {item.carbs}g  •  F: {item.fat}g
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], onRemoveItem, onEditItem, readOnly }) => {
   const theme = useTheme();
   const cardBg = theme.colors.elevation.level1;
 
@@ -94,15 +113,19 @@ export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], 
         )}
         style={styles.accordion}
       >
-        {items.map((item) => (
-          <SwipeableRow
-            key={item.id}
-            item={item}
-            bg={cardBg}
-            onRemove={() => onRemoveItem(category, item.id)}
-            onEdit={onEditItem ? () => onEditItem(category, item) : undefined}
-          />
-        ))}
+        {items.map((item) =>
+          readOnly ? (
+            <ReadOnlyRow key={item.id} item={item} />
+          ) : (
+            <SwipeableRow
+              key={item.id}
+              item={item}
+              bg={cardBg}
+              onRemove={() => onRemoveItem?.(category, item.id)}
+              onEdit={onEditItem ? () => onEditItem(category, item) : undefined}
+            />
+          )
+        )}
       </List.Accordion>
       {items.length === 0 && (
         <Text variant="bodyMedium" style={styles.empty}>No entries yet</Text>

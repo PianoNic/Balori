@@ -239,7 +239,7 @@ export default function TrendScreen() {
               category={category}
               meta={MEAL_META[category]}
               items={meals[category]}
-              onRemoveItem={() => {}}
+              readOnly
             />
           ))}
         </View>
