@@ -1,5 +1,5 @@
 import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
-import { getDayLog, getDayTotals, getGoals, removeMealItem, setGoal } from '@/services/storage';
+import { getDayLog, getDayTotals, getGoals, removeMealItem, setGoal, updateMealItem } from '@/services/storage';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -28,8 +28,19 @@ export default function FuelScreen() {
     breakfast: [], lunch: [], dinner: [], snack: []
   });
   
-  const [editingType, setEditingType] = useState<string | null>(null);
-  const [tempGoal, setTempGoal] = useState('');
+  const [editingMacro, setEditingMacro] = useState<keyof NutritionGoals | null>(null);
+  const [tempMacroValue, setTempMacroValue] = useState('');
+
+  const [editingMeal, setEditingMeal] = useState<{ category: MealCategory, item: MealItem } | null>(null);
+  const [editMealName, setEditMealName] = useState('');
+  const [editMealAmount, setEditMealAmount] = useState('');
+  const [editMealKcal, setEditMealKcal] = useState('');
+  const [editMealProtein, setEditMealProtein] = useState('');
+  const [editMealCarbs, setEditMealCarbs] = useState('');
+  const [editMealFat, setEditMealFat] = useState('');
+
+  const today = new Date();
+  const dateString = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(today);
 
   const loadData = useCallback(async () => {
     const [g, t, log] = await Promise.all([getGoals(), getDayTotals(), getDayLog()]);
@@ -40,29 +51,52 @@ export default function FuelScreen() {
 
   useFocusEffect(useCallback(() => { loadData(); }, [loadData]));
 
-  const today = new Date();
-  const dateString = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(today);
-
-  const openDialog = (type: string) => {
-    setEditingType(type);
-    setTempGoal(goals[type as keyof typeof goals]?.toString() ?? '');
+  const openMacroDialog = (type: keyof NutritionGoals) => {
+    setEditingMacro(type);
+    setTempMacroValue(goals[type] > 0 ? goals[type].toString() : '');
   };
 
-  const handleSave = async () => {
-    if (editingType) {
-      const numGoal = parseInt(tempGoal, 10);
+  const saveMacro = async () => {
+    if (editingMacro) {
+      const numGoal = parseInt(tempMacroValue, 10);
       if (!isNaN(numGoal) && numGoal > 0) {
-        await setGoal(editingType as keyof typeof goals, numGoal);
-        setGoalsState(await getGoals());
+        await setGoal(editingMacro, numGoal);
+        await loadData();
       }
     }
-    setEditingType(null);
+    setEditingMacro(null);
   };
 
   const handleRemoveItem = async (category: MealCategory, itemId: string) => {
     await removeMealItem(category, itemId);
-    setTotals(await getDayTotals());
-    setMeals((await getDayLog()).meals);
+    await loadData();
+  };
+
+  const openEditMeal = (category: MealCategory, item: MealItem) => {
+    setEditingMeal({ category, item });
+    setEditMealName(item.name);
+    setEditMealAmount(item.amountGrams?.toString() || '0');
+    setEditMealKcal(item.kcal.toString());
+    setEditMealProtein(item.protein.toString());
+    setEditMealCarbs(item.carbs.toString());
+    setEditMealFat(item.fat.toString());
+  };
+
+  const saveMealEdit = async () => {
+    if (editingMeal) {
+      const updatedItem: MealItem = { 
+        ...editingMeal.item, 
+        name: editMealName, 
+        amountGrams: parseFloat(editMealAmount) || 0,
+        kcal: parseInt(editMealKcal, 10) || 0,
+        protein: parseInt(editMealProtein, 10) || 0,
+        carbs: parseInt(editMealCarbs, 10) || 0,
+        fat: parseInt(editMealFat, 10) || 0,
+      };
+      await updateMealItem(editingMeal.category, updatedItem);
+      await loadData();
+    }
+    setEditingMeal(null);
   };
 
   return (
@@ -74,7 +108,7 @@ export default function FuelScreen() {
         </View>
 
         <View style={styles.content}>
-          <Pressable onPress={() => openDialog('calories')} style={styles.mainCircle}>
+          <Pressable onPress={() => openMacroDialog('calories')} style={styles.mainCircle}>
             <ProgressCircle
               size={mainCircleSize}
               strokeWidth={mainCircleSize * 0.08}
@@ -90,7 +124,7 @@ export default function FuelScreen() {
 
           <View style={styles.macroRow}>
             {(['protein', 'carbs', 'fat'] as const).map((key) => (
-              <Pressable key={key} onPress={() => openDialog(key)} style={styles.macroItem}>
+              <Pressable key={key} onPress={() => openMacroDialog(key)} style={styles.macroItem}>
                 <ProgressCircle
                   size={macroCircleSize}
                   strokeWidth={macroCircleSize * 0.1}
@@ -121,26 +155,52 @@ export default function FuelScreen() {
               meta={MEAL_META[category]}
               items={meals[category]}
               onRemoveItem={handleRemoveItem}
+              onEditItem={openEditMeal}
             />
           ))}
         </View>
       </ScrollView>
 
       <Portal>
-        <Dialog visible={editingType !== null} onDismiss={() => setEditingType(null)} style={{ backgroundColor: theme.colors.surface }}>
-          <Dialog.Title>Set {editingType} Goal</Dialog.Title>
+        {/* Dialog: Makro-Ziele bearbeiten */}
+        <Dialog visible={editingMacro !== null} onDismiss={() => setEditingMacro(null)} style={{ backgroundColor: theme.colors.surface }}>
+          <Dialog.Title>Set {editingMacro} Goal</Dialog.Title>
           <Dialog.Content>
             <TextInput 
-              label="Target" 
-              value={tempGoal} 
-              onChangeText={setTempGoal} 
-              keyboardType="numeric" 
-              mode="outlined" 
+              label="Target" value={tempMacroValue} onChangeText={setTempMacroValue} 
+              keyboardType="numeric" mode="outlined" 
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setEditingType(null)}>Cancel</Button>
-            <Button onPress={handleSave}>Save</Button>
+            <Button onPress={() => setEditingMacro(null)}>Cancel</Button>
+            <Button onPress={saveMacro}>Save</Button>
+          </Dialog.Actions>
+        </Dialog>
+
+        {/* Dialog: Mahlzeit Eintrag komplett bearbeiten */}
+        <Dialog visible={editingMeal !== null} onDismiss={() => setEditingMeal(null)} style={{ backgroundColor: theme.colors.surface, maxHeight: '80%' }}>
+          <Dialog.Title>Eintrag bearbeiten</Dialog.Title>
+          <Dialog.Content>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <TextInput label="Name" value={editMealName} onChangeText={setEditMealName} mode="outlined" style={styles.inputSpacing} />
+              
+              <View style={styles.inputRow}>
+                <TextInput label="Menge (g/ml)" value={editMealAmount} onChangeText={setEditMealAmount} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
+                <TextInput label="Kalorien (kcal)" value={editMealKcal} onChangeText={setEditMealKcal} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginLeft: 4 }]} />
+              </View>
+
+              <Text variant="labelLarge" style={{ marginTop: 8, marginBottom: 4, color: theme.colors.onSurfaceVariant }}>Makros (g)</Text>
+              
+              <View style={styles.inputRow}>
+                <TextInput label="Protein" value={editMealProtein} onChangeText={setEditMealProtein} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
+                <TextInput label="Carbs" value={editMealCarbs} onChangeText={setEditMealCarbs} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginHorizontal: 4 }]} />
+                <TextInput label="Fat" value={editMealFat} onChangeText={setEditMealFat} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginLeft: 4 }]} />
+              </View>
+            </ScrollView>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setEditingMeal(null)}>Abbrechen</Button>
+            <Button onPress={saveMealEdit}>Speichern</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -162,4 +222,8 @@ const styles = StyleSheet.create({
   macroLabel: { marginTop: 8, fontWeight: '600' },
   mealsSection: { paddingHorizontal: '5%' },
   sectionTitle: { marginBottom: 16, marginLeft: 8 },
+  
+  inputSpacing: { marginBottom: 12 },
+  inputRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
+  flex1: { flex: 1 }
 });
