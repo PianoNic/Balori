@@ -1,9 +1,6 @@
 name: Build Android APK
 
 on:
-  push:
-    tags:
-      - 'v*'
   release:
     types: [created]
 
@@ -42,22 +39,7 @@ jobs:
           echo "path=$APK_PATH" >> "$GITHUB_OUTPUT"
           echo "Found APK at $APK_PATH"
 
-      - name: Get version from tag
-        id: version
-        run: echo "tag=${GITHUB_REF_NAME:-${{ github.event.release.tag_name }}}" >> "$GITHUB_OUTPUT"
-
-      - name: Upload to existing release
-        if: github.event_name == 'release'
+      - name: Upload APK to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.event.release.tag_name }}" "${{ steps.apk.outputs.path }}#Balori-${{ steps.version.outputs.tag }}.apk"
-
-      - name: Create release from tag
-        if: github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "${{ steps.version.outputs.tag }}" \
-            "${{ steps.apk.outputs.path }}#Balori-${{ steps.version.outputs.tag }}.apk" \
-            --title "Balori ${{ steps.version.outputs.tag }}" \
-            --generate-notes
+        run: gh release upload "${{ github.event.release.tag_name }}" "${{ steps.apk.outputs.path }}#Balori-${{ github.event.release.tag_name }}.apk"
