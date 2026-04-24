@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
-import { Animated, Pressable, StyleSheet, View } from 'react-native';
-import { Swipeable } from 'react-native-gesture-handler';
+import { Pressable, StyleSheet, View } from 'react-native';
+import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
+import Animated, { type SharedValue, useAnimatedStyle, interpolate } from 'react-native-reanimated';
 import { Avatar, Card, List, Text, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { MealCategory, MealItem } from '../models/meal-entry';
@@ -13,6 +14,20 @@ interface MealCardProps {
   onEditItem?: (category: MealCategory, item: MealItem) => void;
 }
 
+function DeleteAction({ drag, onPress }: { drag: SharedValue<number>; onPress: () => void }) {
+  const theme = useTheme();
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: interpolate(drag.value, [0, 80], [0.5, 1], 'clamp') }],
+  }));
+  return (
+    <Pressable onPress={onPress} style={[styles.deleteAction, { backgroundColor: theme.colors.error }]}>
+      <Animated.View style={animStyle}>
+        <MaterialCommunityIcons name="delete-outline" size={24} color={theme.colors.onError} />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
 function SwipeableRow({ item, bg, onRemove, onEdit }: {
   item: MealItem;
   bg: string;
@@ -20,26 +35,19 @@ function SwipeableRow({ item, bg, onRemove, onEdit }: {
   onEdit?: () => void;
 }) {
   const theme = useTheme();
-  const ref = useRef<Swipeable>(null);
+  const swipeRef = useRef<SwipeableMethods>(null);
 
-  const renderLeftActions = (_p: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
-    const scale = dragX.interpolate({ inputRange: [0, 80], outputRange: [0.5, 1], extrapolate: 'clamp' });
-    return (
-      <View style={[styles.deleteAction, { backgroundColor: theme.colors.error }]}>
-        <Animated.View style={{ transform: [{ scale }] }}>
-          <MaterialCommunityIcons name="delete-outline" size={24} color={theme.colors.onError} />
-        </Animated.View>
-      </View>
-    );
+  const handleDelete = () => {
+    swipeRef.current?.close();
+    onRemove();
   };
 
   return (
-    <Swipeable
-      ref={ref}
-      renderLeftActions={renderLeftActions}
-      leftThreshold={80}
+    <ReanimatedSwipeable
+      ref={swipeRef}
+      renderLeftActions={(_p, drag) => <DeleteAction drag={drag} onPress={handleDelete} />}
       overshootLeft={false}
-      onSwipeableOpen={() => { ref.current?.close(); onRemove(); }}
+      friction={2}
     >
       <Pressable onPress={onEdit} style={[styles.item, { backgroundColor: bg }]}>
         <View style={styles.itemTop}>
@@ -53,7 +61,7 @@ function SwipeableRow({ item, bg, onRemove, onEdit }: {
           </Text>
         </View>
       </Pressable>
-    </Swipeable>
+    </ReanimatedSwipeable>
   );
 }
 
@@ -123,5 +131,5 @@ const styles = StyleSheet.create({
   itemBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   sub: { opacity: 0.7, fontSize: 13 },
   empty: { fontStyle: 'italic', opacity: 0.5, textAlign: 'center', paddingVertical: 20 },
-  deleteAction: { flex: 1, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 20 },
+  deleteAction: { width: 80, justifyContent: 'center', alignItems: 'center' },
 });
