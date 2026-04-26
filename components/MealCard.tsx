@@ -22,19 +22,14 @@ function SwipeableRow({ item, bg, onRemove, onEdit }: {
   const theme = useTheme();
   const ref = useRef<Swipeable>(null);
 
-  const handleDelete = () => {
-    ref.current?.close();
-    onRemove();
-  };
-
   const renderLeftActions = (_p: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
     const scale = dragX.interpolate({ inputRange: [0, 80], outputRange: [0.5, 1], extrapolate: 'clamp' });
     return (
-      <Pressable onPress={handleDelete} style={[styles.deleteAction, { backgroundColor: theme.colors.error }]}>
+      <View style={[styles.deleteAction, { backgroundColor: theme.colors.error }]}>
         <Animated.View style={{ transform: [{ scale }] }}>
           <MaterialCommunityIcons name="delete-outline" size={24} color={theme.colors.onError} />
         </Animated.View>
-      </Pressable>
+      </View>
     );
   };
 
@@ -42,8 +37,9 @@ function SwipeableRow({ item, bg, onRemove, onEdit }: {
     <Swipeable
       ref={ref}
       renderLeftActions={renderLeftActions}
+      leftThreshold={80}
       overshootLeft={false}
-      friction={2}
+      onSwipeableOpen={() => { ref.current?.close(); onRemove(); }}
     >
       <Pressable onPress={onEdit} style={[styles.item, { backgroundColor: bg }]}>
         <View style={styles.itemTop}>
@@ -127,5 +123,5 @@ const styles = StyleSheet.create({
   itemBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   sub: { opacity: 0.7, fontSize: 13 },
   empty: { fontStyle: 'italic', opacity: 0.5, textAlign: 'center', paddingVertical: 20 },
-  deleteAction: { width: 80, justifyContent: 'center', alignItems: 'center' },
+  deleteAction: { flex: 1, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 20 },
 });
