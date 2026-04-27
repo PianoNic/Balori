@@ -1,13 +1,12 @@
-import { CreateProductDialog } from '@/dialogs/CreateProductDialog';
-import { MacroInputRow } from '@/components/MacroInputRow';
+import { ProductDialog } from '@/dialogs/ProductDialog';
 import type { Product } from '@/models/product';
-import { deleteProduct, getProducts, saveProduct } from '@/services/storage';
+import { deleteProduct, generateId, getProducts, saveProduct } from '@/services/storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { Button, Card, Dialog, FAB, Portal, Text, TextInput, useTheme } from 'react-native-paper';
+import { Button, Card, FAB, Portal, Text, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 function SwipeableProduct({ product, backgroundColor, onRemove, onAddToMeal, onEdit }: {
@@ -89,12 +88,6 @@ export default function ProductsScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [createDialogVisible, setCreateDialogVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editBrand, setEditBrand] = useState('');
-  const [editKcal, setEditKcal] = useState('');
-  const [editProtein, setEditProtein] = useState('');
-  const [editCarbs, setEditCarbs] = useState('');
-  const [editFat, setEditFat] = useState('');
 
   const loadData = useCallback(async () => {
     const data = await getProducts();
@@ -119,28 +112,35 @@ export default function ProductsScreen() {
     });
   };
 
-  const openEdit = (product: Product) => {
-    setEditingProduct(product);
-    setEditName(product.name || '');
-    setEditBrand(product.brand || '');
-    setEditKcal((product.nutriments?.energyKcal100g || 0).toString());
-    setEditProtein((product.nutriments?.proteins100g || 0).toString());
-    setEditCarbs((product.nutriments?.carbohydrates100g || 0).toString());
-    setEditFat((product.nutriments?.fat100g || 0).toString());
+  const handleCreate = async (values: { name: string; brand: string; kcal: string; protein: string; carbs: string; fat: string }) => {
+    await saveProduct({
+      barcode: `custom_${generateId()}`,
+      name: values.name.trim(),
+      brand: values.brand.trim() || null,
+      imageUrl: null,
+      nutriments: {
+        energyKcal100g: parseFloat(values.kcal) || 0,
+        proteins100g: parseFloat(values.protein) || null,
+        carbohydrates100g: parseFloat(values.carbs) || null,
+        fat100g: parseFloat(values.fat) || null,
+      },
+    });
+    setCreateDialogVisible(false);
+    await loadData();
   };
 
-  const saveEdit = async () => {
+  const handleEdit = async (values: { name: string; brand: string; kcal: string; protein: string; carbs: string; fat: string }) => {
     if (editingProduct) {
       await saveProduct({
         ...editingProduct,
-        name: editName,
-        brand: editBrand || null,
+        name: values.name,
+        brand: values.brand || null,
         nutriments: {
           ...editingProduct.nutriments,
-          energyKcal100g: parseFloat(editKcal) || 0,
-          proteins100g: parseFloat(editProtein) || 0,
-          carbohydrates100g: parseFloat(editCarbs) || 0,
-          fat100g: parseFloat(editFat) || 0,
+          energyKcal100g: parseFloat(values.kcal) || 0,
+          proteins100g: parseFloat(values.protein) || 0,
+          carbohydrates100g: parseFloat(values.carbs) || 0,
+          fat100g: parseFloat(values.fat) || 0,
         },
       });
       await loadData();
@@ -170,7 +170,7 @@ export default function ProductsScreen() {
                   backgroundColor={itemBackground}
                   onRemove={() => handleRemove(product.barcode)}
                   onAddToMeal={() => handleAddToMeal(product)}
-                  onEdit={() => openEdit(product)}
+                  onEdit={() => setEditingProduct(product)}
                 />
               ))
             )}
@@ -186,35 +186,25 @@ export default function ProductsScreen() {
       />
 
       <Portal>
-        <Dialog visible={editingProduct !== null} onDismiss={() => setEditingProduct(null)} style={{ backgroundColor: theme.colors.surface, maxHeight: '85%' }}>
-          <Dialog.Title>Produkt bearbeiten</Dialog.Title>
-          <Dialog.Content>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <TextInput label="Name" value={editName} onChangeText={setEditName} mode="outlined" style={styles.inputSpacing} />
-              <TextInput label="Marke (optional)" value={editBrand} onChangeText={setEditBrand} mode="outlined" style={styles.inputSpacing} />
-              <Text variant="labelLarge" style={{ marginTop: 8, marginBottom: 4, color: theme.colors.onSurfaceVariant }}>
-                Nährwerte pro 100g/ml
-              </Text>
-              <TextInput label="Kalorien (kcal)" value={editKcal} onChangeText={setEditKcal} keyboardType="numeric" mode="outlined" style={styles.inputSpacing} />
-              <MacroInputRow
-                protein={editProtein}
-                carbs={editCarbs}
-                fat={editFat}
-                onProteinChange={setEditProtein}
-                onCarbsChange={setEditCarbs}
-                onFatChange={setEditFat}
-              />
-            </ScrollView>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setEditingProduct(null)}>Abbrechen</Button>
-            <Button onPress={saveEdit} mode="contained">Speichern</Button>
-          </Dialog.Actions>
-        </Dialog>
-        <CreateProductDialog
+        <ProductDialog
+          visible={editingProduct !== null}
+          title="Produkt bearbeiten"
+          initial={editingProduct ? {
+            name: editingProduct.name || '',
+            brand: editingProduct.brand || '',
+            kcal: (editingProduct.nutriments?.energyKcal100g || 0).toString(),
+            protein: (editingProduct.nutriments?.proteins100g || 0).toString(),
+            carbs: (editingProduct.nutriments?.carbohydrates100g || 0).toString(),
+            fat: (editingProduct.nutriments?.fat100g || 0).toString(),
+          } : undefined}
+          onDismiss={() => setEditingProduct(null)}
+          onSave={handleEdit}
+        />
+        <ProductDialog
           visible={createDialogVisible}
+          title="Produkt erstellen"
           onDismiss={() => setCreateDialogVisible(false)}
-          onCreated={() => { setCreateDialogVisible(false); loadData(); }}
+          onSave={handleCreate}
         />
       </Portal>
     </SafeAreaView>
@@ -233,5 +223,4 @@ const styles = StyleSheet.create({
   swipeAction: { flex: 1, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 20 },
   swipeActionRight: { alignItems: 'flex-end', paddingLeft: 0, paddingRight: 20 },
   fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, borderRadius: 30 },
-  inputSpacing: { marginBottom: 12 },
 });

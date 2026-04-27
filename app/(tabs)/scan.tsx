@@ -1,4 +1,5 @@
-import { CreateProductDialog } from '@/dialogs/CreateProductDialog';
+import { ProductDialog } from '@/dialogs/ProductDialog';
+import { saveProduct, generateId } from '@/services/storage';
 import { getProductByBarcode } from '@/services/open-food-facts';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { router, useFocusEffect } from 'expo-router';
@@ -113,10 +114,25 @@ export default function ScanScreen() {
             </Button>
           </Dialog.Actions>
         </Dialog>
-        <CreateProductDialog
+        <ProductDialog
           visible={createDialogVisible}
+          title="Produkt erstellen"
           onDismiss={() => setCreateDialogVisible(false)}
-          onCreated={() => setCreateDialogVisible(false)}
+          onSave={async (values) => {
+            await saveProduct({
+              barcode: `custom_${generateId()}`,
+              name: values.name.trim(),
+              brand: values.brand.trim() || null,
+              imageUrl: null,
+              nutriments: {
+                energyKcal100g: parseFloat(values.kcal) || 0,
+                proteins100g: parseFloat(values.protein) || null,
+                carbohydrates100g: parseFloat(values.carbs) || null,
+                fat100g: parseFloat(values.fat) || null,
+              },
+            });
+            setCreateDialogVisible(false);
+          }}
         />
       </Portal>
     </Surface>
