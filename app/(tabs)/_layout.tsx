@@ -51,7 +51,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="scan" // Route wurde von 'add' auf 'scan' geändert
+        name="scan"
         options={{
           title: 'Scan',
           tabBarIcon: ({ color, size }) => (

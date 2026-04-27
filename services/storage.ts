@@ -23,8 +23,6 @@ async function writeJSON(key: string, value: unknown): Promise<void> {
   await AsyncStorage.setItem(key, JSON.stringify(value));
 }
 
-// ── Products ──
-
 export async function getProducts(): Promise<Product[]> {
   return readJSON<Product[]>(KEYS.PRODUCTS, []);
 }
@@ -45,7 +43,6 @@ export async function deleteProduct(barcode: string): Promise<void> {
   await writeJSON(KEYS.PRODUCTS, products.filter((p) => p.barcode !== barcode));
 }
 
-// ── Nutrition Goals ──
 
 const DEFAULT_GOALS: NutritionGoals = { calories: 2000, protein: 150, carbs: 250, fat: 70 };
 
@@ -63,7 +60,6 @@ export async function setGoal(key: keyof NutritionGoals, value: number): Promise
   await setGoals(goals);
 }
 
-// ── Day Logs (meals) ──
 
 function emptyMeals(): Record<MealCategory, MealItem[]> {
   return { breakfast: [], lunch: [], dinner: [], snack: [] };
@@ -100,7 +96,6 @@ export async function getDayTotals(date?: string) {
   return { calories, protein, carbs, fat };
 }
 
-// ── History ──
 
 export async function getDayLogs(days: number): Promise<DayLog[]> {
   const logs: DayLog[] = [];
@@ -114,7 +109,6 @@ export async function getDayLogs(days: number): Promise<DayLog[]> {
   return logs;
 }
 
-// ── Helpers ──
 
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);

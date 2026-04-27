@@ -10,6 +10,7 @@ const MONTH_NAMES = [
 
 function getCalendarDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1);
+  // Convert Sunday=0 to Monday-first index (Mon=0, Sun=6)
   let startWeekday = firstDay.getDay() - 1;
   if (startWeekday < 0)
     startWeekday = 6;
