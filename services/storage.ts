@@ -28,11 +28,6 @@ export async function getProducts(): Promise<Product[]> {
   return readJSON<Product[]>(KEYS.PRODUCTS, []);
 }
 
-export async function getProductByBarcode(barcode: string): Promise<Product | undefined> {
-  const products = await getProducts();
-  return products.find((p) => p.barcode === barcode);
-}
-
 export async function saveProduct(product: Product): Promise<void> {
   const products = await getProducts();
   const index = products.findIndex((p) => p.barcode === product.barcode);
@@ -104,19 +99,6 @@ export async function getDayTotals(date?: string) {
   return { calories, protein, carbs, fat };
 }
 
-export async function getMealTotals(category: MealCategory, date?: string) {
-  const log = await getDayLog(date);
-  const items = log.meals[category];
-  let calories = 0, protein = 0, carbs = 0, fat = 0;
-  for (const item of items) {
-    calories += item.kcal;
-    protein += item.protein;
-    carbs += item.carbs;
-    fat += item.fat;
-  }
-  return { calories, protein, carbs, fat };
-}
-
 // ── History ──
 
 export async function getDayLogs(days: number): Promise<DayLog[]> {
@@ -135,10 +117,6 @@ export async function getDayLogs(days: number): Promise<DayLog[]> {
 
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
-
-export async function clearAll(): Promise<void> {
-  await AsyncStorage.clear();
 }
 
 export async function updateMealItem(category: MealCategory, updatedItem: MealItem, date?: string): Promise<void> {

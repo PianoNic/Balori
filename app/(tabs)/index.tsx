@@ -1,6 +1,7 @@
 import { EditMealDialog } from '@/components/EditMealDialog';
 import { MealCard } from '@/components/MealCard';
 import { ProgressCircle } from '@/components/ProgressCircle';
+import { MEAL_META } from '@/constants/meals';
 import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
 import { getDayLog, getDayTotals, getGoals, removeMealItem, setGoal, updateMealItem } from '@/services/storage';
 import { useFocusEffect } from 'expo-router';
@@ -15,13 +16,6 @@ export default function FuelScreen() {
   
   const mainCircleSize = Math.min(screenWidth * 0.55, 280); 
   const macroCircleSize = Math.min(screenWidth * 0.22, 100);
-
-  const MEAL_META: Record<MealCategory, { label: string; icon: string }> = {
-    breakfast: { label: 'Breakfast', icon: 'coffee' },
-    lunch: { label: 'Lunch', icon: 'food-apple' },
-    dinner: { label: 'Dinner', icon: 'food-variant' },
-    snack: { label: 'Snack', icon: 'cookie' },
-  };
 
   const [goals, setGoalsState] = useState<NutritionGoals>({ calories: 2000, protein: 150, carbs: 250, fat: 70 });
   const [totals, setTotals] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
@@ -163,7 +157,6 @@ export default function FuelScreen() {
       </ScrollView>
 
       <Portal>
-        {/* Dialog: Makro-Ziele bearbeiten */}
         <Dialog visible={editingMacro !== null} onDismiss={() => setEditingMacro(null)} style={{ backgroundColor: theme.colors.surface }}>
           <Dialog.Title>Set {editingMacro} Goal</Dialog.Title>
           <Dialog.Content>
