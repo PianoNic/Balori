@@ -66,9 +66,6 @@ function SwipeableProduct({ product, backgroundColor, onRemove, onAddToMeal, onE
       <Pressable style={[styles.productRow, { backgroundColor }]} onPress={onEdit}>
         <View style={{ flex: 1, paddingRight: 16 }}>
           <Text variant="bodyLarge" style={styles.bold} numberOfLines={1}>{product.name || 'Unnamed Product'}</Text>
-          {!!product.brand && (
-            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>{product.brand}</Text>
-          )}
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{calories} kcal</Text>
@@ -88,7 +85,6 @@ export default function ProductsScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editName, setEditName] = useState('');
-  const [editBrand, setEditBrand] = useState('');
   const [editKcal, setEditKcal] = useState('');
   const [editProtein, setEditProtein] = useState('');
   const [editCarbs, setEditCarbs] = useState('');
@@ -120,7 +116,6 @@ export default function ProductsScreen() {
   const openEdit = (product: Product) => {
     setEditingProduct(product);
     setEditName(product.name || '');
-    setEditBrand(product.brand || '');
     setEditKcal((product.nutriments?.energyKcal100g || 0).toString());
     setEditProtein((product.nutriments?.proteins100g || 0).toString());
     setEditCarbs((product.nutriments?.carbohydrates100g || 0).toString());
@@ -132,7 +127,6 @@ export default function ProductsScreen() {
       await saveProduct({
         ...editingProduct,
         name: editName,
-        brand: editBrand || null,
         nutriments: {
           ...editingProduct.nutriments,
           energyKcal100g: parseFloat(editKcal) || 0,
@@ -189,7 +183,6 @@ export default function ProductsScreen() {
           <Dialog.Content>
             <ScrollView showsVerticalScrollIndicator={false}>
               <TextInput label="Name" value={editName} onChangeText={setEditName} mode="outlined" style={styles.inputSpacing} />
-              <TextInput label="Marke (optional)" value={editBrand} onChangeText={setEditBrand} mode="outlined" style={styles.inputSpacing} />
               <Text variant="labelLarge" style={{ marginTop: 8, marginBottom: 4, color: theme.colors.onSurfaceVariant }}>
                 Nährwerte pro 100g/ml
               </Text>

@@ -21,7 +21,6 @@ export default function CreateProductScreen() {
     const product: Product = {
       barcode: `custom_${generateId()}`,
       name: name.trim(),
-      brand: null,
       imageUrl: null,
       nutriments: {
         energyKcal100g: parseFloat(calories) || 0,

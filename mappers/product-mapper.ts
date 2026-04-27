@@ -9,7 +9,6 @@ export function mapApiProduct(barcode: string, raw: Record<string, unknown>): Pr
   return {
     barcode,
     name: (raw.product_name as string) || null,
-    brand: (raw.brands as string) || null,
     imageUrl: (raw.image_front_url as string) || null,
     nutriments: {
       energyKcal100g: toNumber(rawNutriments['energy-kcal_100g']),

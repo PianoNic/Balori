@@ -3,7 +3,6 @@ import type { Nutriments } from './nutriments';
 export interface Product {
   barcode: string;
   name: string | null;
-  brand: string | null;
   imageUrl: string | null;
   nutriments: Nutriments;
 }

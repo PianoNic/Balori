@@ -46,9 +46,6 @@ export default function ProductDetailScreen() {
               <Text variant="headlineMedium" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
                 {product.name ?? 'Unbekanntes Produkt'}
               </Text>
-              {product.brand && (
-                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{product.brand}</Text>
-              )}
             </Surface>
           </Surface>
         ) : (
@@ -56,9 +53,6 @@ export default function ProductDetailScreen() {
             <Text variant="headlineMedium" style={{ color: theme.colors.onBackground, fontWeight: 'bold' }}>
               {product.name ?? 'Unbekanntes Produkt'}
             </Text>
-            {product.brand && (
-              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{product.brand}</Text>
-            )}
           </Surface>
         )}
 
