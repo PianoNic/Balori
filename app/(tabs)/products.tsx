@@ -1,4 +1,4 @@
-import { CreateProductDialog } from '@/components/CreateProductDialog';
+import { CreateProductDialog } from '@/dialogs/CreateProductDialog';
 import { MacroInputRow } from '@/components/MacroInputRow';
 import type { Product } from '@/models/product';
 import { deleteProduct, getProducts, saveProduct } from '@/services/storage';

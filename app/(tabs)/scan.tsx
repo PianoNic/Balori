@@ -1,4 +1,4 @@
-import { CreateProductDialog } from '@/components/CreateProductDialog';
+import { CreateProductDialog } from '@/dialogs/CreateProductDialog';
 import { getProductByBarcode } from '@/services/open-food-facts';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { router, useFocusEffect } from 'expo-router';

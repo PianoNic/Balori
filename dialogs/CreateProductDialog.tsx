@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Dialog, Text, TextInput, useTheme } from 'react-native-paper';
-import { MacroInputRow } from './MacroInputRow';
+import { MacroInputRow } from '@/components/MacroInputRow';
 import { saveProduct, generateId } from '@/services/storage';
 import type { Product } from '@/models/product';
 
