@@ -1,0 +1,118 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ProgressCircle /> rendert den ProgressCircle korrekt (Snapshot) 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "center",
+        "height": 120,
+        "justifyContent": "center",
+        "width": 120,
+      },
+      undefined,
+    ]
+  }
+>
+  <RNSVGSvgView
+    bbHeight={120}
+    bbWidth={120}
+    focusable={false}
+    height={120}
+    style={
+      [
+        {
+          "backgroundColor": "transparent",
+          "borderWidth": 0,
+        },
+        {
+          "flex": 0,
+          "height": 120,
+          "width": 120,
+        },
+      ]
+    }
+    width={120}
+  >
+    <RNSVGGroup
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    >
+      <RNSVGCircle
+        cx={60}
+        cy={60}
+        fill={null}
+        propList={
+          [
+            "fill",
+            "stroke",
+            "strokeWidth",
+          ]
+        }
+        r={54}
+        stroke={
+          {
+            "payload": 4292927712,
+            "type": 0,
+          }
+        }
+        strokeWidth={12}
+      />
+      <RNSVGCircle
+        cx={60}
+        cy={60}
+        fill={null}
+        matrix={
+          [
+            6.123233995736766e-17,
+            -1,
+            1,
+            6.123233995736766e-17,
+            -7.105427357601002e-15,
+            120,
+          ]
+        }
+        propList={
+          [
+            "fill",
+            "stroke",
+            "strokeWidth",
+            "strokeDasharray",
+            "strokeDashoffset",
+            "strokeLinecap",
+          ]
+        }
+        r={54}
+        stroke={
+          {
+            "payload": 4283215696,
+            "type": 0,
+          }
+        }
+        strokeDasharray={
+          [
+            339.29200658769764,
+            339.29200658769764,
+          ]
+        }
+        strokeDashoffset={84.82300164692441}
+        strokeLinecap={1}
+        strokeWidth={12}
+      />
+    </RNSVGGroup>
+  </RNSVGSvgView>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "justifyContent": "center",
+        "position": "absolute",
+      }
+    }
+  />
+</View>
+`;
