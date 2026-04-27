@@ -5,23 +5,12 @@ import { ProgressCircle } from '@/components/ProgressCircle';
 import { MEAL_META } from '@/constants/meals';
 import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
 import { getDayLog, getDayLogs, getDayTotals, getGoals, removeMealItem, updateMealItem } from '@/services/storage';
+import { computeStreak } from '@/utils/compute-streak';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Portal, Surface, Text, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-function computeStreak(logs: Awaited<ReturnType<typeof getDayLogs>>): number {
-  let streak = 0;
-  for (const log of logs) {
-    const hasEntries = Object.values(log.meals).some((items) => items.length > 0);
-    if (hasEntries)
-      streak++;
-    else
-      break;
-  }
-  return streak;
-}
 
 export default function TrendScreen() {
   const theme = useTheme();
