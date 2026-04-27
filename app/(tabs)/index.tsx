@@ -1,3 +1,6 @@
+import { EditMealDialog } from '@/components/EditMealDialog';
+import { MealCard } from '@/components/MealCard';
+import { ProgressCircle } from '@/components/ProgressCircle';
 import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
 import { getDayLog, getDayTotals, getGoals, removeMealItem, setGoal, updateMealItem } from '@/services/storage';
 import { useFocusEffect } from 'expo-router';
@@ -5,8 +8,6 @@ import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Button, Dialog, Portal, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MealCard } from '../../components/MealCard';
-import { ProgressCircle } from '../../components/ProgressCircle';
 
 export default function FuelScreen() {
   const theme = useTheme();
@@ -177,32 +178,23 @@ export default function FuelScreen() {
           </Dialog.Actions>
         </Dialog>
 
-        {/* Dialog: Mahlzeit Eintrag komplett bearbeiten */}
-        <Dialog visible={editingMeal !== null} onDismiss={() => setEditingMeal(null)} style={{ backgroundColor: theme.colors.surface, maxHeight: '80%' }}>
-          <Dialog.Title>Eintrag bearbeiten</Dialog.Title>
-          <Dialog.Content>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <TextInput label="Name" value={editMealName} onChangeText={setEditMealName} mode="outlined" style={styles.inputSpacing} />
-              
-              <View style={styles.inputRow}>
-                <TextInput label="Menge (g/ml)" value={editMealAmount} onChangeText={setEditMealAmount} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
-                <TextInput label="Kalorien (kcal)" value={editMealKcal} onChangeText={setEditMealKcal} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginLeft: 4 }]} />
-              </View>
-
-              <Text variant="labelLarge" style={{ marginTop: 8, marginBottom: 4, color: theme.colors.onSurfaceVariant }}>Makros (g)</Text>
-              
-              <View style={styles.inputRow}>
-                <TextInput label="Protein" value={editMealProtein} onChangeText={setEditMealProtein} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
-                <TextInput label="Carbs" value={editMealCarbs} onChangeText={setEditMealCarbs} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginHorizontal: 4 }]} />
-                <TextInput label="Fat" value={editMealFat} onChangeText={setEditMealFat} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginLeft: 4 }]} />
-              </View>
-            </ScrollView>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setEditingMeal(null)}>Abbrechen</Button>
-            <Button onPress={saveMealEdit}>Speichern</Button>
-          </Dialog.Actions>
-        </Dialog>
+        <EditMealDialog
+          visible={editingMeal !== null}
+          name={editMealName}
+          amount={editMealAmount}
+          kcal={editMealKcal}
+          protein={editMealProtein}
+          carbs={editMealCarbs}
+          fat={editMealFat}
+          onNameChange={setEditMealName}
+          onAmountChange={setEditMealAmount}
+          onKcalChange={setEditMealKcal}
+          onProteinChange={setEditMealProtein}
+          onCarbsChange={setEditMealCarbs}
+          onFatChange={setEditMealFat}
+          onDismiss={() => setEditingMeal(null)}
+          onSave={saveMealEdit}
+        />
       </Portal>
     </SafeAreaView>
   );
@@ -222,8 +214,4 @@ const styles = StyleSheet.create({
   macroLabel: { marginTop: 8, fontWeight: '600' },
   mealsSection: { paddingHorizontal: '5%' },
   sectionTitle: { marginBottom: 16, marginLeft: 8 },
-  
-  inputSpacing: { marginBottom: 12 },
-  inputRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  flex1: { flex: 1 }
 });
