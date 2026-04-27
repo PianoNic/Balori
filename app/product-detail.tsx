@@ -144,7 +144,6 @@ export default function ProductDetailScreen() {
           await addMealItem(selectedMeal, {
             id: generateId(),
             name: product.name ?? 'Unbekannt',
-            barcode: product.barcode,
             amountGrams: portionGrams,
             kcal: Math.round((n.energyKcal100g ?? 0) * factor),
             protein: Math.round((n.proteins100g ?? 0) * factor),
