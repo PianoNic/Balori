@@ -44,3 +44,7 @@ app-example
 
 # Playwright MCP
 .playwright-mcp/
+
+# LearningView course documents
+docs/learningview/files/
+docs/learningview/*.json
