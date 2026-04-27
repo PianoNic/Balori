@@ -1,15 +1,17 @@
+import { CreateProductDialog } from '@/components/CreateProductDialog';
+import { getProductByBarcode } from '@/services/open-food-facts';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { router, useFocusEffect } from 'expo-router';
 import { useState, useRef, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text, Button, useTheme, Surface, Portal, Dialog } from 'react-native-paper';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { router, useFocusEffect } from 'expo-router';
-import { getProductByBarcode } from '@/services/open-food-facts';
 
 export default function ScanScreen() {
   const theme = useTheme();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanning, setScanning] = useState(true);
   const [notFoundBarcode, setNotFoundBarcode] = useState<string | null>(null);
+  const [createDialogVisible, setCreateDialogVisible] = useState(false);
   const lastScannedRef = useRef<string | null>(null);
 
   useFocusEffect(useCallback(() => {
@@ -93,7 +95,7 @@ export default function ScanScreen() {
         mode="contained"
         style={[styles.createButton, { backgroundColor: theme.colors.primary }]}
         labelStyle={{ color: theme.colors.onPrimary, letterSpacing: 1 }}
-        onPress={() => router.push('/create-product')}
+        onPress={() => setCreateDialogVisible(true)}
       >
         PRODUKT SELBST ANLEGEN
       </Button>
@@ -106,11 +108,16 @@ export default function ScanScreen() {
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={dismissNotFound}>OK</Button>
-            <Button onPress={() => { setNotFoundBarcode(null); router.push('/create-product'); }}>
+            <Button onPress={() => { setNotFoundBarcode(null); setCreateDialogVisible(true); }}>
               Selbst anlegen
             </Button>
           </Dialog.Actions>
         </Dialog>
+        <CreateProductDialog
+          visible={createDialogVisible}
+          onDismiss={() => setCreateDialogVisible(false)}
+          onCreated={() => setCreateDialogVisible(false)}
+        />
       </Portal>
     </Surface>
   );

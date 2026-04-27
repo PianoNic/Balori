@@ -1,3 +1,4 @@
+import { CreateProductDialog } from '@/components/CreateProductDialog';
 import { MacroInputRow } from '@/components/MacroInputRow';
 import type { Product } from '@/models/product';
 import { deleteProduct, getProducts, saveProduct } from '@/services/storage';
@@ -86,6 +87,7 @@ export default function ProductsScreen() {
   const router = useRouter();
   const itemBackground = theme.colors.elevation.level1;
   const [products, setProducts] = useState<Product[]>([]);
+  const [createDialogVisible, setCreateDialogVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editName, setEditName] = useState('');
   const [editBrand, setEditBrand] = useState('');
@@ -180,7 +182,7 @@ export default function ProductsScreen() {
         icon="plus"
         style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         color={theme.colors.onPrimary}
-        onPress={() => router.push('/create-product')}
+        onPress={() => setCreateDialogVisible(true)}
       />
 
       <Portal>
@@ -209,6 +211,11 @@ export default function ProductsScreen() {
             <Button onPress={saveEdit} mode="contained">Speichern</Button>
           </Dialog.Actions>
         </Dialog>
+        <CreateProductDialog
+          visible={createDialogVisible}
+          onDismiss={() => setCreateDialogVisible(false)}
+          onCreated={() => { setCreateDialogVisible(false); loadData(); }}
+        />
       </Portal>
     </SafeAreaView>
   );
