@@ -1,3 +1,4 @@
+import { Calendar } from '@/components/Calendar';
 import { MealCard } from '@/components/MealCard';
 import { ProgressCircle } from '@/components/ProgressCircle';
 import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
@@ -5,7 +6,7 @@ import { getDayLog, getDayLogs, getDayTotals, getGoals, removeMealItem, updateMe
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { Button, Dialog, IconButton, Portal, Surface, Text, TextInput, useTheme } from 'react-native-paper';
+import { Button, Dialog, Portal, Surface, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const MEAL_META: Record<MealCategory, { label: string; icon: string }> = {
@@ -14,45 +15,6 @@ const MEAL_META: Record<MealCategory, { label: string; icon: string }> = {
   dinner: { label: 'Dinner', icon: 'food-variant' },
   snack: { label: 'Snack', icon: 'cookie' },
 };
-
-const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
-function getCalendarDays(year: number, month: number) {
-  const firstDay = new Date(year, month, 1);
-  let startWeekday = firstDay.getDay() - 1;
-  if (startWeekday < 0) startWeekday = 6;
-
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const daysInPrevMonth = new Date(year, month, 0).getDate();
-
-  const days: { day: number; currentMonth: boolean; dateKey: string }[] = [];
-
-  for (let i = startWeekday - 1; i >= 0; i--) {
-    const d = daysInPrevMonth - i;
-    const m = month === 0 ? 11 : month - 1;
-    const y = month === 0 ? year - 1 : year;
-    days.push({ day: d, currentMonth: false, dateKey: `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}` });
-  }
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    days.push({ day: d, currentMonth: true, dateKey: `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}` });
-  }
-
-  const remaining = 7 - (days.length % 7);
-  if (remaining < 7) {
-    for (let d = 1; d <= remaining; d++) {
-      const m = month === 11 ? 0 : month + 1;
-      const y = month === 11 ? year + 1 : year;
-      days.push({ day: d, currentMonth: false, dateKey: `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}` });
-    }
-  }
-
-  return days;
-}
 
 function computeStreak(logs: Awaited<ReturnType<typeof getDayLogs>>): number {
   let streak = 0;
@@ -136,8 +98,6 @@ export default function TrendScreen() {
     setEditingMeal(null);
   };
 
-  const calendarDays = getCalendarDays(viewYear, viewMonth);
-
   const prevMonth = () => {
     if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
     else setViewMonth(viewMonth - 1);
@@ -172,58 +132,15 @@ export default function TrendScreen() {
         </Surface>
 
         <Surface style={[styles.calendarCard, { backgroundColor: theme.colors.elevation.level2 }]} elevation={0}>
-          <View style={styles.calendarHeader}>
-            <IconButton icon="chevron-left" onPress={prevMonth} iconColor={theme.colors.primary} size={20} />
-            <Text variant="titleMedium" style={[styles.bold, { color: theme.colors.onBackground }]}>
-              {MONTH_NAMES[viewMonth]} {viewYear}
-            </Text>
-            <IconButton icon="chevron-right" onPress={nextMonth} iconColor={theme.colors.primary} size={20} />
-          </View>
-
-          <View style={styles.weekdayRow}>
-            {WEEKDAYS.map((d) => (
-              <View key={d} style={styles.weekdayCell}>
-                <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, fontWeight: 'bold' }}>
-                  {d}
-                </Text>
-              </View>
-            ))}
-          </View>
-
-          {Array.from({ length: calendarDays.length / 7 }, (_, row) => (
-            <View key={row} style={styles.calendarRow}>
-              {calendarDays.slice(row * 7, row * 7 + 7).map((item, idx) => {
-                const isSelected = item.dateKey === selectedDate;
-                const isToday = item.dateKey === todayKey;
-                return (
-                  <Pressable
-                    key={idx}
-                    onPress={() => setSelectedDate(item.dateKey)}
-                    style={[
-                      styles.dayCell,
-                      isSelected && { backgroundColor: theme.colors.primary, borderRadius: 10 },
-                      isToday && !isSelected && { borderWidth: 1.5, borderColor: theme.colors.primary, borderRadius: 10 },
-                    ]}
-                  >
-                    <Text
-                      variant="bodyMedium"
-                      style={{
-                        color: isSelected
-                          ? theme.colors.onPrimary
-                          : item.currentMonth
-                            ? theme.colors.onBackground
-                            : theme.colors.onSurfaceVariant,
-                        fontWeight: isToday || isSelected ? 'bold' : 'normal',
-                        opacity: item.currentMonth ? 1 : 0.3,
-                      }}
-                    >
-                      {item.day}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          ))}
+          <Calendar
+            viewMonth={viewMonth}
+            viewYear={viewYear}
+            selectedDate={selectedDate}
+            todayKey={todayKey}
+            onPrevMonth={prevMonth}
+            onNextMonth={nextMonth}
+            onSelectDate={setSelectedDate}
+          />
         </Surface>
 
         <View style={styles.nutritionSection}>
@@ -333,32 +250,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingBottom: 8,
     marginBottom: 24,
-  },
-  calendarHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  weekdayRow: {
-    flexDirection: 'row',
-    marginBottom: 2,
-    paddingHorizontal: 4,
-  },
-  weekdayCell: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  calendarRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 4,
-  },
-  dayCell: {
-    flex: 1,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 1,
   },
 
   nutritionSection: {
