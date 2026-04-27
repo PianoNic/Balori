@@ -1,3 +1,4 @@
+import { MacroInputRow } from '@/components/MacroInputRow';
 import type { Product } from '@/models/product';
 import { deleteProduct, getProducts, saveProduct } from '@/services/storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -188,11 +189,14 @@ export default function ProductsScreen() {
                 Nährwerte pro 100g/ml
               </Text>
               <TextInput label="Kalorien (kcal)" value={editKcal} onChangeText={setEditKcal} keyboardType="numeric" mode="outlined" style={styles.inputSpacing} />
-              <View style={styles.inputRow}>
-                <TextInput label="Protein" value={editProtein} onChangeText={setEditProtein} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
-                <TextInput label="Carbs" value={editCarbs} onChangeText={setEditCarbs} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginHorizontal: 4 }]} />
-                <TextInput label="Fat" value={editFat} onChangeText={setEditFat} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginLeft: 4 }]} />
-              </View>
+              <MacroInputRow
+                protein={editProtein}
+                carbs={editCarbs}
+                fat={editFat}
+                onProteinChange={setEditProtein}
+                onCarbsChange={setEditCarbs}
+                onFatChange={setEditFat}
+              />
             </ScrollView>
           </Dialog.Content>
           <Dialog.Actions>
@@ -218,6 +222,4 @@ const styles = StyleSheet.create({
   swipeActionRight: { alignItems: 'flex-end', paddingLeft: 0, paddingRight: 20 },
   fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, borderRadius: 30 },
   inputSpacing: { marginBottom: 12 },
-  inputRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  flex1: { flex: 1 },
 });
