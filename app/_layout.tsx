@@ -51,8 +51,8 @@ export default function RootLayout() {
         <ThemeProvider value={navigationTheme}>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="product-detail" options={{ headerShown: false }} />
-            <Stack.Screen name="create-product" options={{ presentation: 'modal', headerShown: false }} />
+            <Stack.Screen name="(pages)" options={{ headerShown: false }} />
+            <Stack.Screen name="(modals)" options={{ headerShown: false }} />
           </Stack>
           <StatusBar style="light" />
         </ThemeProvider>
