@@ -1,5 +1,5 @@
 import type { ProductResult } from '@/models/product';
-import { mapApiProduct } from './mappers';
+import { mapApiProduct } from '@/mappers/product-mapper';
 
 const BASE_URL = 'https://world.openfoodfacts.org/api/v2/product';
 

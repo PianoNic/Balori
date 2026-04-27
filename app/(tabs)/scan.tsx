@@ -17,7 +17,8 @@ export default function ScanScreen() {
     lastScannedRef.current = null;
   }, []));
 
-  if (!permission) return null;
+  if (!permission)
+    return null;
 
   if (!permission.granted) {
     return (
@@ -38,7 +39,8 @@ export default function ScanScreen() {
   }
 
   async function handleBarcodeScanned({ data }: { data: string }) {
-    if (!scanning || data === lastScannedRef.current) return;
+    if (!scanning || data === lastScannedRef.current)
+      return;
 
     setScanning(false);
     lastScannedRef.current = data;

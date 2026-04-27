@@ -11,7 +11,8 @@ const MONTH_NAMES = [
 function getCalendarDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1);
   let startWeekday = firstDay.getDay() - 1;
-  if (startWeekday < 0) startWeekday = 6;
+  if (startWeekday < 0)
+    startWeekday = 6;
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
@@ -19,22 +20,22 @@ function getCalendarDays(year: number, month: number) {
   const days: { day: number; currentMonth: boolean; dateKey: string }[] = [];
 
   for (let i = startWeekday - 1; i >= 0; i--) {
-    const d = daysInPrevMonth - i;
-    const m = month === 0 ? 11 : month - 1;
-    const y = month === 0 ? year - 1 : year;
-    days.push({ day: d, currentMonth: false, dateKey: `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}` });
+    const dayNumber = daysInPrevMonth - i;
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevYear = month === 0 ? year - 1 : year;
+    days.push({ day: dayNumber, currentMonth: false, dateKey: `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}` });
   }
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    days.push({ day: d, currentMonth: true, dateKey: `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}` });
+  for (let dayNumber = 1; dayNumber <= daysInMonth; dayNumber++) {
+    days.push({ day: dayNumber, currentMonth: true, dateKey: `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}` });
   }
 
   const remaining = 7 - (days.length % 7);
   if (remaining < 7) {
-    for (let d = 1; d <= remaining; d++) {
-      const m = month === 11 ? 0 : month + 1;
-      const y = month === 11 ? year + 1 : year;
-      days.push({ day: d, currentMonth: false, dateKey: `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}` });
+    for (let dayNumber = 1; dayNumber <= remaining; dayNumber++) {
+      const nextMonth = month === 11 ? 0 : month + 1;
+      const nextYear = month === 11 ? year + 1 : year;
+      days.push({ day: dayNumber, currentMonth: false, dateKey: `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}` });
     }
   }
 
@@ -66,10 +67,10 @@ export function Calendar({ viewMonth, viewYear, selectedDate, todayKey, onPrevMo
       </View>
 
       <View style={styles.weekdayRow}>
-        {WEEKDAYS.map((d) => (
-          <View key={d} style={styles.weekdayCell}>
+        {WEEKDAYS.map((dayLabel) => (
+          <View key={dayLabel} style={styles.weekdayCell}>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, fontWeight: 'bold' }}>
-              {d}
+              {dayLabel}
             </Text>
           </View>
         ))}

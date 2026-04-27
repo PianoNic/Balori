@@ -24,12 +24,13 @@ export default function ProductDetailScreen() {
   const [customDialogVisible, setCustomDialogVisible] = useState(false);
   const [customInput, setCustomInput] = useState('');
 
-  const factor = portionGrams / 100;
-  const n = product.nutriments;
+  const portionFactor = portionGrams / 100;
+  const nutriments = product.nutriments;
 
-  function scaleValue(val: number | null): string {
-    if (val === null) return '--';
-    return Math.round(val * factor).toString();
+  function scaleValue(nutrimentValue: number | null): string {
+    if (nutrimentValue === null)
+      return '--';
+    return Math.round(nutrimentValue * portionFactor).toString();
   }
 
   return (
@@ -120,10 +121,10 @@ export default function ProductDetailScreen() {
         </Text>
         <Surface style={styles.nutritionGrid} elevation={0}>
           {[
-            { label: 'ENERGY', value: scaleValue(n.energyKcal100g), unit: 'kcal' },
-            { label: 'PROTEIN', value: scaleValue(n.proteins100g), unit: 'g' },
-            { label: 'CARBS', value: scaleValue(n.carbohydrates100g), unit: 'g' },
-            { label: 'FAT', value: scaleValue(n.fat100g), unit: 'g' },
+            { label: 'ENERGY', value: scaleValue(nutriments.energyKcal100g), unit: 'kcal' },
+            { label: 'PROTEIN', value: scaleValue(nutriments.proteins100g), unit: 'g' },
+            { label: 'CARBS', value: scaleValue(nutriments.carbohydrates100g), unit: 'g' },
+            { label: 'FAT', value: scaleValue(nutriments.fat100g), unit: 'g' },
           ].map(({ label, value, unit }) => (
             <Surface key={label} style={[styles.nutritionSquare, { backgroundColor: theme.colors.elevation.level2 }]} elevation={0}>
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>{label}</Text>
@@ -145,10 +146,10 @@ export default function ProductDetailScreen() {
             id: generateId(),
             name: product.name ?? 'Unbekannt',
             amountGrams: portionGrams,
-            kcal: Math.round((n.energyKcal100g ?? 0) * factor),
-            protein: Math.round((n.proteins100g ?? 0) * factor),
-            carbs: Math.round((n.carbohydrates100g ?? 0) * factor),
-            fat: Math.round((n.fat100g ?? 0) * factor),
+            kcal: Math.round((nutriments.energyKcal100g ?? 0) * portionFactor),
+            protein: Math.round((nutriments.proteins100g ?? 0) * portionFactor),
+            carbs: Math.round((nutriments.carbohydrates100g ?? 0) * portionFactor),
+            fat: Math.round((nutriments.fat100g ?? 0) * portionFactor),
           });
           router.back();
         }}
@@ -175,8 +176,9 @@ export default function ProductDetailScreen() {
           <Dialog.Actions>
             <Button onPress={() => setCustomDialogVisible(false)}>Abbrechen</Button>
             <Button onPress={() => {
-              const val = parseInt(customInput, 10);
-              if (val > 0) setPortionGrams(val);
+              const grams = parseInt(customInput, 10);
+              if (grams > 0)
+                setPortionGrams(grams);
               setCustomDialogVisible(false);
             }}>
               Übernehmen

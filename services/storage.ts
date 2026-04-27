@@ -14,7 +14,8 @@ function todayKey(): string {
 
 async function readJSON<T>(key: string, fallback: T): Promise<T> {
   const raw = await AsyncStorage.getItem(key);
-  if (!raw) return fallback;
+  if (!raw)
+    return fallback;
   return JSON.parse(raw) as T;
 }
 
@@ -69,8 +70,8 @@ function emptyMeals(): Record<MealCategory, MealItem[]> {
 }
 
 export async function getDayLog(date?: string): Promise<DayLog> {
-  const d = date ?? todayKey();
-  return readJSON<DayLog>(KEYS.dayLog(d), { date: d, meals: emptyMeals() });
+  const dateKey = date ?? todayKey();
+  return readJSON<DayLog>(KEYS.dayLog(dateKey), { date: dateKey, meals: emptyMeals() });
 }
 
 export async function addMealItem(category: MealCategory, item: MealItem, date?: string): Promise<void> {
@@ -81,7 +82,7 @@ export async function addMealItem(category: MealCategory, item: MealItem, date?:
 
 export async function removeMealItem(category: MealCategory, itemId: string, date?: string): Promise<void> {
   const log = await getDayLog(date);
-  log.meals[category] = log.meals[category].filter((i) => i.id !== itemId);
+  log.meals[category] = log.meals[category].filter((item) => item.id !== itemId);
   await writeJSON(KEYS.dayLog(log.date), log);
 }
 
@@ -105,9 +106,9 @@ export async function getDayLogs(days: number): Promise<DayLog[]> {
   const logs: DayLog[] = [];
   const now = new Date();
   for (let i = 0; i < days; i++) {
-    const d = new Date(now);
-    d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
+    const currentDate = new Date(now);
+    currentDate.setDate(currentDate.getDate() - i);
+    const key = currentDate.toISOString().slice(0, 10);
     logs.push(await getDayLog(key));
   }
   return logs;
@@ -122,7 +123,7 @@ export function generateId(): string {
 export async function updateMealItem(category: MealCategory, updatedItem: MealItem, date?: string): Promise<void> {
   const log = await getDayLog(date);
   const items = log.meals[category];
-  const index = items.findIndex(i => i.id === updatedItem.id);
+  const index = items.findIndex(item => item.id === updatedItem.id);
   if (index !== -1) {
     items[index] = updatedItem;
     await writeJSON(KEYS.dayLog(log.date), log);

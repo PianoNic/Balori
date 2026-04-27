@@ -22,7 +22,7 @@ function SwipeableRow({ item, bg, onRemove, onEdit }: {
   const theme = useTheme();
   const ref = useRef<Swipeable>(null);
 
-  const renderLeftActions = (_p: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
+  const renderLeftActions = (_progress: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
     const scale = dragX.interpolate({ inputRange: [0, 80], outputRange: [0.5, 1], extrapolate: 'clamp' });
     return (
       <View style={[styles.deleteAction, { backgroundColor: theme.colors.error }]}>
@@ -47,8 +47,8 @@ function SwipeableRow({ item, bg, onRemove, onEdit }: {
           <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{item.kcal} kcal</Text>
         </View>
         <View style={styles.itemBottom}>
-          <Text variant="bodyMedium" style={styles.sub}>{item.amountGrams}g</Text>
-          <Text variant="bodyMedium" style={styles.sub}>
+          <Text variant="bodyMedium" style={styles.secondaryText}>{item.amountGrams}g</Text>
+          <Text variant="bodyMedium" style={styles.secondaryText}>
             P: {item.protein}g  •  C: {item.carbs}g  •  F: {item.fat}g
           </Text>
         </View>
@@ -59,12 +59,12 @@ function SwipeableRow({ item, bg, onRemove, onEdit }: {
 
 export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], onRemoveItem, onEditItem }) => {
   const theme = useTheme();
-  const cardBg = theme.colors.elevation.level1;
+  const itemBackground = theme.colors.elevation.level1;
 
-  const mealCals = items.reduce((s, i) => s + i.kcal, 0);
-  const mealP = items.reduce((s, i) => s + i.protein, 0);
-  const mealC = items.reduce((s, i) => s + i.carbs, 0);
-  const mealF = items.reduce((s, i) => s + i.fat, 0);
+  const totalCalories = items.reduce((sum, item) => sum + item.kcal, 0);
+  const totalProtein = items.reduce((sum, item) => sum + item.protein, 0);
+  const totalCarbs = items.reduce((sum, item) => sum + item.carbs, 0);
+  const totalFat = items.reduce((sum, item) => sum + item.fat, 0);
 
   return (
     <Card style={styles.card} mode="contained">
@@ -72,7 +72,7 @@ export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], 
         title={<Text variant="titleMedium" style={styles.bold} numberOfLines={1}>{meta.label}</Text>}
         description={
           <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, paddingTop: 2 }}>
-            P: {mealP}g   •   C: {mealC}g   •   F: {mealF}g
+            P: {totalProtein}g   •   C: {totalCarbs}g   •   F: {totalFat}g
           </Text>
         }
         left={() => (
@@ -86,7 +86,7 @@ export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], 
         right={(props: { isExpanded?: boolean }) => (
           <View style={styles.rightSection}>
             <View style={styles.calSection}>
-              <Text variant="titleMedium" style={[styles.bold, { color: theme.colors.primary }]}>{mealCals}</Text>
+              <Text variant="titleMedium" style={[styles.bold, { color: theme.colors.primary }]}>{totalCalories}</Text>
               <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>kcal</Text>
             </View>
             <List.Icon icon={props.isExpanded ? 'chevron-up' : 'chevron-down'} style={{ margin: 0 }} />
@@ -98,7 +98,7 @@ export const MealCard: React.FC<MealCardProps> = ({ category, meta, items = [], 
           <SwipeableRow
             key={item.id}
             item={item}
-            bg={cardBg}
+            bg={itemBackground}
             onRemove={() => onRemoveItem(category, item.id)}
             onEdit={onEditItem ? () => onEditItem(category, item) : undefined}
           />
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   item: { paddingHorizontal: 20, paddingVertical: 14 },
   itemTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   itemBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  sub: { opacity: 0.7, fontSize: 13 },
+  secondaryText: { opacity: 0.7, fontSize: 13 },
   empty: { fontStyle: 'italic', opacity: 0.5, textAlign: 'center', paddingVertical: 20 },
   deleteAction: { flex: 1, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 20 },
 });

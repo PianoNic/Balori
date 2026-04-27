@@ -38,10 +38,12 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
+    if (fontsLoaded)
+      SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded)
+    return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

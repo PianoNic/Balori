@@ -15,8 +15,10 @@ function computeStreak(logs: Awaited<ReturnType<typeof getDayLogs>>): number {
   let streak = 0;
   for (const log of logs) {
     const hasEntries = Object.values(log.meals).some((items) => items.length > 0);
-    if (hasEntries) streak++;
-    else break;
+    if (hasEntries)
+      streak++;
+    else
+      break;
   }
   return streak;
 }
@@ -44,10 +46,10 @@ export default function TrendScreen() {
   const [editMealFat, setEditMealFat] = useState('');
 
   const loadDay = useCallback(async (date: string) => {
-    const [t, log, g] = await Promise.all([getDayTotals(date), getDayLog(date), getGoals()]);
-    setTotals(t);
-    setMeals(log.meals);
-    setGoalsState(g);
+    const [loadedTotals, dayLog, loadedGoals] = await Promise.all([getDayTotals(date), getDayLog(date), getGoals()]);
+    setTotals(loadedTotals);
+    setMeals(dayLog.meals);
+    setGoalsState(loadedGoals);
   }, []);
 
   const loadStreak = useCallback(async () => {
@@ -94,13 +96,21 @@ export default function TrendScreen() {
   };
 
   const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
-    else setViewMonth(viewMonth - 1);
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear(viewYear - 1);
+    } else {
+      setViewMonth(viewMonth - 1);
+    }
   };
 
   const nextMonth = () => {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
-    else setViewMonth(viewMonth + 1);
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear(viewYear + 1);
+    } else {
+      setViewMonth(viewMonth + 1);
+    }
   };
 
   return (
