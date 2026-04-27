@@ -38,10 +38,10 @@ export default function FuelScreen() {
   const dateString = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(today);
 
   const loadData = useCallback(async () => {
-    const [g, t, log] = await Promise.all([getGoals(), getDayTotals(), getDayLog()]);
-    setGoalsState(g);
-    setTotals(t);
-    setMeals(log.meals);
+    const [loadedGoals, loadedTotals, dayLog] = await Promise.all([getGoals(), getDayTotals(), getDayLog()]);
+    setGoalsState(loadedGoals);
+    setTotals(loadedTotals);
+    setMeals(dayLog.meals);
   }, []);
 
   useFocusEffect(useCallback(() => { loadData(); }, [loadData]));

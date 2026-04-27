@@ -9,9 +9,9 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { Button, Card, Dialog, FAB, Portal, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
+function SwipeableProduct({ product, backgroundColor, onRemove, onAddToMeal, onEdit }: {
   product: Product;
-  cardBg: string;
+  backgroundColor: string;
   onRemove: () => void;
   onAddToMeal: () => void;
   onEdit: () => void;
@@ -19,12 +19,12 @@ function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
   const theme = useTheme();
   const ref = useRef<Swipeable>(null);
 
-  const pKcal = product.nutriments?.energyKcal100g || 0;
-  const pPro = product.nutriments?.proteins100g || 0;
-  const pCarbs = product.nutriments?.carbohydrates100g || 0;
-  const pFat = product.nutriments?.fat100g || 0;
+  const calories = product.nutriments?.energyKcal100g || 0;
+  const protein = product.nutriments?.proteins100g || 0;
+  const carbs = product.nutriments?.carbohydrates100g || 0;
+  const fat = product.nutriments?.fat100g || 0;
 
-  const renderLeftActions = (_p: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
+  const renderLeftActions = (_progress: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
     const scale = dragX.interpolate({ inputRange: [0, 80], outputRange: [0.5, 1], extrapolate: 'clamp' });
     return (
       <View style={[styles.swipeAction, { backgroundColor: theme.colors.error }]}>
@@ -35,7 +35,7 @@ function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
     );
   };
 
-  const renderRightActions = (_p: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
+  const renderRightActions = (_progress: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
     const scale = dragX.interpolate({ inputRange: [-80, 0], outputRange: [1, 0.5], extrapolate: 'clamp' });
     return (
       <View style={[styles.swipeAction, styles.swipeActionRight, { backgroundColor: theme.colors.primary }]}>
@@ -57,11 +57,13 @@ function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
       overshootRight={false}
       onSwipeableOpen={(direction) => {
         ref.current?.close();
-        if (direction === 'left') onRemove();
-        else onAddToMeal();
+        if (direction === 'left')
+          onRemove();
+        else
+          onAddToMeal();
       }}
     >
-      <Pressable style={[styles.productRow, { backgroundColor: cardBg }]} onPress={onEdit}>
+      <Pressable style={[styles.productRow, { backgroundColor }]} onPress={onEdit}>
         <View style={{ flex: 1, paddingRight: 16 }}>
           <Text variant="bodyLarge" style={styles.bold} numberOfLines={1}>{product.name || 'Unnamed Product'}</Text>
           {!!product.brand && (
@@ -69,9 +71,9 @@ function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
           )}
         </View>
         <View style={{ alignItems: 'flex-end' }}>
-          <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{pKcal} kcal</Text>
-          <Text variant="bodySmall" style={styles.sub}>
-            P: {pPro}g  •  C: {pCarbs}g  •  F: {pFat}g
+          <Text variant="bodyLarge" style={[styles.bold, { color: theme.colors.primary }]}>{calories} kcal</Text>
+          <Text variant="bodySmall" style={styles.secondaryText}>
+            P: {protein}g  •  C: {carbs}g  •  F: {fat}g
           </Text>
         </View>
       </Pressable>
@@ -82,7 +84,7 @@ function SwipeableProduct({ product, cardBg, onRemove, onAddToMeal, onEdit }: {
 export default function ProductsScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const cardBg = theme.colors.elevation.level1;
+  const itemBackground = theme.colors.elevation.level1;
   const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editName, setEditName] = useState('');
@@ -94,7 +96,10 @@ export default function ProductsScreen() {
 
   const loadData = useCallback(async () => {
     const data = await getProducts();
-    if (!Array.isArray(data)) { setProducts([]); return; }
+    if (!Array.isArray(data)) {
+      setProducts([]);
+      return;
+    }
     setProducts([...data].sort((a, b) => (a?.name || '').localeCompare(b?.name || '')));
   }, []);
 
@@ -160,7 +165,7 @@ export default function ProductsScreen() {
                 <SwipeableProduct
                   key={product.barcode}
                   product={product}
-                  cardBg={cardBg}
+                  backgroundColor={itemBackground}
                   onRemove={() => handleRemove(product.barcode)}
                   onAddToMeal={() => handleAddToMeal(product)}
                   onEdit={() => openEdit(product)}
@@ -217,7 +222,7 @@ const styles = StyleSheet.create({
   listCard: { borderRadius: 28, overflow: 'hidden' },
   empty: { fontStyle: 'italic', opacity: 0.5, textAlign: 'center', paddingVertical: 20 },
   productRow: { paddingHorizontal: 20, paddingVertical: 14, flexDirection: 'row', alignItems: 'center' },
-  sub: { opacity: 0.7, fontSize: 13 },
+  secondaryText: { opacity: 0.7, fontSize: 13 },
   swipeAction: { flex: 1, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 20 },
   swipeActionRight: { alignItems: 'flex-end', paddingLeft: 0, paddingRight: 20 },
   fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, borderRadius: 30 },
