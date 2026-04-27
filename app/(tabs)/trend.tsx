@@ -2,6 +2,7 @@ import { Calendar } from '@/components/Calendar';
 import { EditMealDialog } from '@/components/EditMealDialog';
 import { MealCard } from '@/components/MealCard';
 import { ProgressCircle } from '@/components/ProgressCircle';
+import { MEAL_META } from '@/constants/meals';
 import type { MealCategory, MealItem, NutritionGoals } from '@/models/meal-entry';
 import { getDayLog, getDayLogs, getDayTotals, getGoals, removeMealItem, updateMealItem } from '@/services/storage';
 import { useFocusEffect } from 'expo-router';
@@ -9,13 +10,6 @@ import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Portal, Surface, Text, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const MEAL_META: Record<MealCategory, { label: string; icon: string }> = {
-  breakfast: { label: 'Breakfast', icon: 'coffee' },
-  lunch: { label: 'Lunch', icon: 'food-apple' },
-  dinner: { label: 'Dinner', icon: 'food-variant' },
-  snack: { label: 'Snack', icon: 'cookie' },
-};
 
 function computeStreak(logs: Awaited<ReturnType<typeof getDayLogs>>): number {
   let streak = 0;
