@@ -22,24 +22,13 @@ export default function CreateProductScreen() {
       barcode: `custom_${generateId()}`,
       name: name.trim(),
       brand: null,
-      quantity: null,
-      categories: [],
       imageUrl: null,
-      imageThumbnailUrl: null,
       nutriments: {
         energyKcal100g: parseFloat(calories) || 0,
         proteins100g: parseFloat(protein) || null,
         carbohydrates100g: parseFloat(carbs) || null,
         fat100g: parseFloat(fat) || null,
-        saturatedFat100g: null,
-        sugars100g: null,
-        fiber100g: null,
-        salt100g: null,
-        sodium100g: null,
       },
-      nutriScore: null,
-      novaGroup: null,
-      nutrientLevels: { fat: null, saturatedFat: null, sugars: null, salt: null },
     };
     await saveProduct(product);
     router.back();

@@ -3,7 +3,6 @@ export type MealCategory = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 export interface MealItem {
   id: string;
   name: string;
-  barcode: string | null;
   amountGrams: number;
   kcal: number;
   protein: number;
