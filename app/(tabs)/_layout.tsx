@@ -18,30 +18,16 @@ export default function TabLayout() {
         <BottomNavigation.Bar
           navigationState={state}
           safeAreaInsets={insets}
-          onTabPress={({ route, preventDefault }) => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
+          onTabPress={({ route }) => {
+            navigation.dispatch({
+              ...CommonActions.navigate(route.name, route.params),
+              target: state.key,
             });
-
-            if (!event.defaultPrevented) {
-              navigation.dispatch({
-                ...CommonActions.navigate(route.name, route.params),
-                target: state.key,
-              });
-            } else {
-              preventDefault();
-            }
           }}
           renderIcon={({ route, focused, color }) =>
             descriptors[route.key].options.tabBarIcon?.({ focused, color, size: 24 }) ?? null
           }
-          getLabelText={({ route }) =>
-            (descriptors[route.key].options.tabBarLabel as string) ??
-            descriptors[route.key].options.title ??
-            route.name
-          }
+          getLabelText={({ route }) => descriptors[route.key].options.title!}
         />
       )}>
       {TAB_SCREENS.map(({ name, title, icon }) => (
