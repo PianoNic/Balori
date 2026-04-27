@@ -1,0 +1,429 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<MealCard /> rendert eine MealCard mit Items korrekt (Snapshot) 1`] = `
+<RNCSafeAreaProvider
+  onInsetsChange={[Function]}
+  style={
+    [
+      {
+        "flex": 1,
+      },
+      undefined,
+    ]
+  }
+>
+  <View
+    collapsable={false}
+    pointerEvents="box-none"
+    style={
+      {
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      collapsable={false}
+      style={
+        {
+          "backgroundColor": "rgba(231, 224, 236, 1)",
+          "borderRadius": 28,
+          "marginBottom": 16,
+          "shadowColor": "#000",
+          "shadowOffset": {
+            "height": 0,
+            "width": 0,
+          },
+          "shadowOpacity": 0,
+          "shadowRadius": 0,
+        }
+      }
+      testID="card-container-outer-layer"
+    >
+      <View
+        collapsable={false}
+        style={
+          {
+            "backgroundColor": "rgba(231, 224, 236, 1)",
+            "borderRadius": 28,
+            "flex": undefined,
+            "overflow": "hidden",
+            "shadowColor": "#000",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+          }
+        }
+        testID="card-container"
+      >
+        <View
+          style={
+            [
+              {
+                "flexShrink": 1,
+              },
+              undefined,
+            ]
+          }
+          testID="card"
+        >
+          <View>
+            <View
+              style={
+                {
+                  "backgroundColor": "rgba(255, 251, 254, 1)",
+                }
+              }
+            >
+              <View
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": false,
+                    "expanded": false,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  [
+                    {
+                      "overflow": "hidden",
+                    },
+                    [
+                      {
+                        "paddingRight": 24,
+                        "paddingVertical": 8,
+                      },
+                      {
+                        "backgroundColor": "transparent",
+                        "paddingHorizontal": 4,
+                        "paddingVertical": 10,
+                      },
+                    ],
+                  ]
+                }
+              >
+                <View
+                  pointerEvents="none"
+                  style={
+                    [
+                      {
+                        "flexDirection": "row",
+                        "marginVertical": 6,
+                      },
+                      undefined,
+                    ]
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "justifyContent": "center",
+                        "marginLeft": 4,
+                      }
+                    }
+                  >
+                    <View
+                      color="rgba(33, 0, 93, 1)"
+                      style={
+                        [
+                          {
+                            "backgroundColor": "rgba(234, 221, 255, 1)",
+                            "borderRadius": 22,
+                            "height": 44,
+                            "width": 44,
+                          },
+                          {
+                            "alignItems": "center",
+                            "justifyContent": "center",
+                          },
+                          {},
+                        ]
+                      }
+                    >
+                      <Text />
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      [
+                        {
+                          "paddingLeft": 16,
+                        },
+                        {
+                          "flex": 1,
+                          "justifyContent": "center",
+                        },
+                        undefined,
+                      ]
+                    }
+                  >
+                    <Text
+                      numberOfLines={1}
+                      selectable={false}
+                      style={
+                        [
+                          {
+                            "textAlign": "left",
+                          },
+                          {
+                            "color": "rgba(28, 27, 31, 1)",
+                            "fontFamily": "System",
+                            "fontWeight": "400",
+                            "letterSpacing": 0,
+                          },
+                          {
+                            "writingDirection": "ltr",
+                          },
+                          [
+                            {
+                              "fontSize": 16,
+                            },
+                            {
+                              "color": "rgba(28, 27, 31, 1)",
+                            },
+                            undefined,
+                          ],
+                        ]
+                      }
+                    >
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          [
+                            {
+                              "textAlign": "left",
+                            },
+                            {
+                              "color": "rgba(28, 27, 31, 1)",
+                              "writingDirection": "ltr",
+                            },
+                            [
+                              {
+                                "fontFamily": "System",
+                                "fontSize": 16,
+                                "fontWeight": "500",
+                                "letterSpacing": 0.15,
+                                "lineHeight": 24,
+                              },
+                              {
+                                "fontWeight": "bold",
+                              },
+                            ],
+                          ]
+                        }
+                      >
+                        Breakfast
+                      </Text>
+                    </Text>
+                    <Text
+                      numberOfLines={2}
+                      onTextLayout={[Function]}
+                      selectable={false}
+                      style={
+                        [
+                          {
+                            "textAlign": "left",
+                          },
+                          {
+                            "color": "rgba(28, 27, 31, 1)",
+                            "fontFamily": "System",
+                            "fontWeight": "400",
+                            "letterSpacing": 0,
+                          },
+                          {
+                            "writingDirection": "ltr",
+                          },
+                          [
+                            {
+                              "fontSize": 14,
+                            },
+                            {
+                              "color": "rgba(73, 69, 79, 1)",
+                            },
+                            undefined,
+                          ],
+                        ]
+                      }
+                    >
+                      <Text
+                        style={
+                          [
+                            {
+                              "textAlign": "left",
+                            },
+                            {
+                              "color": "rgba(28, 27, 31, 1)",
+                              "writingDirection": "ltr",
+                            },
+                            [
+                              {
+                                "fontFamily": "System",
+                                "fontSize": 12,
+                                "fontWeight": "400",
+                                "letterSpacing": 0.4,
+                                "lineHeight": 16,
+                              },
+                              {
+                                "color": "rgba(73, 69, 79, 1)",
+                                "paddingTop": 2,
+                              },
+                            ],
+                          ]
+                        }
+                      >
+                        P: 
+                        12
+                        g   •   C: 
+                        74
+                        g   •   F: 
+                        6
+                        g
+                      </Text>
+                    </Text>
+                  </View>
+                  <View
+                    style={
+                      [
+                        {
+                          "marginVertical": 6,
+                          "paddingLeft": 8,
+                        },
+                        {
+                          "alignItems": "center",
+                          "height": 40,
+                          "justifyContent": "center",
+                        },
+                      ]
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "paddingRight": 4,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "alignItems": "flex-end",
+                            "justifyContent": "center",
+                            "marginRight": 8,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            [
+                              {
+                                "textAlign": "left",
+                              },
+                              {
+                                "color": "rgba(28, 27, 31, 1)",
+                                "writingDirection": "ltr",
+                              },
+                              [
+                                {
+                                  "fontFamily": "System",
+                                  "fontSize": 16,
+                                  "fontWeight": "500",
+                                  "letterSpacing": 0.15,
+                                  "lineHeight": 24,
+                                },
+                                [
+                                  {
+                                    "fontWeight": "bold",
+                                  },
+                                  {
+                                    "color": "rgba(103, 80, 164, 1)",
+                                  },
+                                ],
+                              ],
+                            ]
+                          }
+                        >
+                          403
+                        </Text>
+                        <Text
+                          style={
+                            [
+                              {
+                                "textAlign": "left",
+                              },
+                              {
+                                "color": "rgba(28, 27, 31, 1)",
+                                "writingDirection": "ltr",
+                              },
+                              [
+                                {
+                                  "fontFamily": "System",
+                                  "fontSize": 11,
+                                  "fontWeight": "500",
+                                  "letterSpacing": 0.5,
+                                  "lineHeight": 16,
+                                },
+                                {
+                                  "color": "rgba(73, 69, 79, 1)",
+                                },
+                              ],
+                            ]
+                          }
+                        >
+                          kcal
+                        </Text>
+                      </View>
+                      <View
+                        pointerEvents="box-none"
+                        style={
+                          [
+                            {
+                              "alignItems": "center",
+                              "justifyContent": "center",
+                            },
+                            {
+                              "margin": 0,
+                            },
+                          ]
+                        }
+                      >
+                        <Text />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RNCSafeAreaProvider>
+`;
