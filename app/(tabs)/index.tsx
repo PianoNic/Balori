@@ -1,4 +1,4 @@
-import { EditMealDialog } from '@/components/EditMealDialog';
+import { EditMealDialog } from '@/dialogs/EditMealDialog';
 import { MealCard } from '@/components/MealCard';
 import { ProgressCircle } from '@/components/ProgressCircle';
 import { MEAL_META } from '@/constants/meals';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Dialog, Text, TextInput, useTheme } from 'react-native-paper';
-import { MacroInputRow } from './MacroInputRow';
+import { MacroInputRow } from '@/components/MacroInputRow';
 
 interface EditMealDialogProps {
   visible: boolean;
