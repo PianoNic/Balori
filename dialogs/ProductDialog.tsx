@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { Keyboard, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Button, Dialog, Text, TextInput, useTheme } from 'react-native-paper';
 import { MacroInputRow } from '@/components/MacroInputRow';
 
@@ -27,6 +27,7 @@ export function ProductDialog({ visible, title, initial, onDismiss, onSave }: Pr
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
 
   useEffect(() => {
     if (visible && initial) {
@@ -47,10 +48,35 @@ export function ProductDialog({ visible, title, initial, onDismiss, onSave }: Pr
     }
   }, [visible, initial]);
 
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      setKeyboardOffset(e.endCoordinates.height / 2);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardOffset(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
   const canSave = name.trim().length > 0;
 
   return (
-    <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.surface, maxHeight: '85%', top: -50 }}>
+    <Dialog
+      visible={visible}
+      onDismiss={onDismiss}
+      style={{
+        backgroundColor: theme.colors.surface,
+        maxHeight: '85%',
+        transform: [{ translateY: -keyboardOffset }],
+      }}
+    >
       <Dialog.Title>{title}</Dialog.Title>
       <Dialog.Content>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
