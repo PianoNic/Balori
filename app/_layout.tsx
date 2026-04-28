@@ -12,6 +12,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { PaperProvider } from 'react-native-paper';
 
 SplashScreen.preventAutoHideAsync();
@@ -46,6 +47,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <KeyboardProvider>
       <PaperProvider theme={baloriTheme}>
         <ThemeProvider value={navigationTheme}>
           <Stack>
@@ -55,6 +57,7 @@ export default function RootLayout() {
           <StatusBar style="light" />
         </ThemeProvider>
       </PaperProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

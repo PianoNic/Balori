@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Dialog, Text, TextInput, useTheme } from 'react-native-paper';
 import { MacroInputRow } from '@/components/MacroInputRow';
 
@@ -27,12 +27,38 @@ export function EditMealDialog({
   onDismiss, onSave,
 }: EditMealDialogProps) {
   const theme = useTheme();
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      setKeyboardOffset(e.endCoordinates.height / 2);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardOffset(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   return (
-    <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.surface, maxHeight: '80%' }}>
+    <Dialog
+      visible={visible}
+      onDismiss={onDismiss}
+      style={{
+        backgroundColor: theme.colors.surface,
+        maxHeight: '80%',
+        transform: [{ translateY: -keyboardOffset }],
+      }}
+    >
       <Dialog.Title>Eintrag bearbeiten</Dialog.Title>
       <Dialog.Content>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <TextInput label="Name" value={name} onChangeText={onNameChange} mode="outlined" style={styles.inputSpacing} />
           <View style={styles.inputRow}>
             <TextInput label="Menge (g/ml)" value={amount} onChangeText={onAmountChange} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
