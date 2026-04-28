@@ -50,10 +50,10 @@ export function ProductDialog({ visible, title, initial, onDismiss, onSave }: Pr
   const canSave = name.trim().length > 0;
 
   return (
-    <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.surface, maxHeight: '85%' }}>
+    <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.surface, maxHeight: '85%', top: -50 }}>
       <Dialog.Title>{title}</Dialog.Title>
       <Dialog.Content>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <TextInput label="Name" value={name} onChangeText={setName} mode="outlined" style={styles.inputSpacing} />
           <TextInput label="Marke (optional)" value={brand} onChangeText={setBrand} mode="outlined" style={styles.inputSpacing} />
           <Text variant="labelLarge" style={{ marginTop: 8, marginBottom: 4, color: theme.colors.onSurfaceVariant }}>

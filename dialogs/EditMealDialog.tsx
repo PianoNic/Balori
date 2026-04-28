@@ -29,10 +29,10 @@ export function EditMealDialog({
   const theme = useTheme();
 
   return (
-    <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.surface, maxHeight: '80%' }}>
+    <Dialog visible={visible} onDismiss={onDismiss} style={{ backgroundColor: theme.colors.surface, maxHeight: '80%', top: -50 }}>
       <Dialog.Title>Eintrag bearbeiten</Dialog.Title>
       <Dialog.Content>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <TextInput label="Name" value={name} onChangeText={onNameChange} mode="outlined" style={styles.inputSpacing} />
           <View style={styles.inputRow}>
             <TextInput label="Menge (g/ml)" value={amount} onChangeText={onAmountChange} keyboardType="numeric" mode="outlined" style={[styles.flex1, { marginRight: 4 }]} />
